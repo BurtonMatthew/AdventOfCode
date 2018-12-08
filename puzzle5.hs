@@ -4,7 +4,7 @@ import Data.List
 
 main :: IO ()
 main = do
-    fileData <- liftM (head . lines) (readFile "input4.txt")
+    fileData <- liftM (head . lines) (readFile "input5.txt")
     putStrLn $ (++) "Part 1: " $ show $ solvePart1 fileData
     putStrLn $ (++) "Part 2: " $ show $ solvePart2 fileData
 
