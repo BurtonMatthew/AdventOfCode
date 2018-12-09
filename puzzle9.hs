@@ -14,18 +14,21 @@ parseGame :: ReadP (Int, Int)
 parseGame = do
     players <- liftM read $ munch1 isDigit
     string " players; last marble is worth "
-    marbles <- liftM read $ munch1 isDigit
-    return (players, marbles)
+    maxValue <- liftM read $ munch1 isDigit
+    return (players, maxValue)
 
 solvePart1 :: Int -> Int -> Int
-solvePart1 players marbles = solvePart1' (Seq.singleton 0) (marbles) 0 (cycle [0..players-1]) (Seq.fromList $ take players $ repeat 0)
+solvePart1 players maxValue = solvePart1' (Seq.singleton 0) maxValue 0 (cycle [0..players-1]) (Seq.fromList $ take players $ repeat 0)
     where 
-        marbs = marbles + 1
+        marbles = maxValue + 1
         solvePart1' :: Seq Int -> Int -> Int -> [Int] -> Seq Int -> Int
         solvePart1' placed 0 pos _ scores = Seq.index (Seq.reverse $ Seq.sort $ scores) 0
         solvePart1' placed numRem pos (pIdx:pIdxs) scores
-            | (marbs - numRem) `mod` 23 == 0 = solvePart1' (Seq.deleteAt (shift (-7)) placed) (numRem-1) (shift (-7)) pIdxs updateScore
-            | otherwise = solvePart1' (Seq.insertAt (shift 2) (marbs - numRem) placed) (numRem-1) (shift 2) pIdxs scores
+            | marbVal `mod` 23 == 0 = solvePart1' removeMarble (numRem-1) (shift (-7)) pIdxs updateScore
+            | otherwise = solvePart1' placeMarble (numRem-1) (shift 2) pIdxs scores
             where
+                marbVal = marbles - numRem
                 shift n = (pos + n) `mod` (length placed)
-                updateScore = Seq.adjust' ((+) (marbs - numRem + Seq.index placed (shift (-7)))) pIdx scores
+                placeMarble = Seq.insertAt (shift 2) marbVal placed
+                removeMarble = Seq.deleteAt (shift (-7)) placed
+                updateScore = Seq.adjust' ((+) (marbVal + Seq.index placed (shift (-7)))) pIdx scores
