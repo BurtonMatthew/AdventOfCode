@@ -24,7 +24,7 @@ solvePart1 players maxValue = solvePart1' (Seq.singleton 0) maxValue 0 cyclePlay
         cyclePlayers = cycle [0..players-1]
         marbles = maxValue + 1
         solvePart1' :: Seq Int -> Int -> Int -> [Int] -> Seq Int -> Int
-        solvePart1' placed 0 pos _ scores = Seq.index (Seq.reverse $ Seq.sort $ scores) 0
+        solvePart1' _ 0 _ _ scores = Seq.index (Seq.reverse $ Seq.sort $ scores) 0
         solvePart1' placed numRem pos (pIdx:pIdxs) scores
             | marbVal `mod` 23 == 0 = solvePart1' removeMarble (numRem-1) (shift (-7)) pIdxs updateScore
             | otherwise = solvePart1' placeMarble (numRem-1) (shift 2) pIdxs scores
