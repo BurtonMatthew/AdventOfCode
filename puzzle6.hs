@@ -22,13 +22,13 @@ solvePart1 :: [(Int,Int)] -> Int
 solvePart1 points = snd $ head $ sortBy largestDist $ countInstances $ filter notNullOrHull $ map closestPointTo allCoords
     where 
         minX :: Int
-        minX = fst $ head $ sortBy (\(x1,_) (x2,_) -> compare x1 x2) points
+        minX = head $ sort $ map fst points
         maxX :: Int
-        maxX = fst $ last $ sortBy (\(x1,_) (x2,_) -> compare x1 x2) points
+        maxX = last $ sort $ map fst points
         minY :: Int
-        minY = snd $ head $ sortBy (\(_,y1) (_,y2) -> compare y1 y2) points
+        minY = head $ sort $ map snd points
         maxY :: Int
-        maxY = snd $ last $ sortBy (\(_,y1) (_,y2) -> compare y1 y2) points
+        maxY = last $ sort $ map snd points
         allCoords :: [(Int,Int)]
         allCoords = [(x,y) | x <- [minX..maxX], y <- [minY..maxY]]
         hullCoords :: [(Int,Int)]
@@ -59,10 +59,10 @@ countInstances keys = toList $ fromListWith (+) $ zip keys $ repeat 1
 solvePart2 :: [(Int,Int)] -> Int
 solvePart2 points = length $ filter coordIsSafe allCoords
     where
-        minX = fst $ head $ sortBy (\(x1,_) (x2,_) -> compare x1 x2) points
-        maxX = fst $ last $ sortBy (\(x1,_) (x2,_) -> compare x1 x2) points
-        minY = snd $ head $ sortBy (\(_,y1) (_,y2) -> compare y1 y2) points
-        maxY = snd $ last $ sortBy (\(_,y1) (_,y2) -> compare y1 y2) points
+        minX = head $ sort $ map fst points
+        maxX = last $ sort $ map fst points
+        minY = head $ sort $ map snd points
+        maxY = last $ sort $ map snd points
         allCoords = [(x,y) | x <- [minX-500..maxX+500], y <- [minY-500..maxY+500]]
         manDist (x1,y1) (x2,y2) = abs (x2-x1) + abs (y2-y1)
         coordIsSafe (x,y) = (sum $ map (manDist (x,y)) points) < 10000
