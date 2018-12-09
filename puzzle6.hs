@@ -9,7 +9,7 @@ main = do
     fileLines <- liftM lines (readFile "input6.txt")
     putStrLn $ (++) "Part 1: " $ show $ solvePart1 $  map (fst . head . readP_to_S parseCoord) fileLines
     putStrLn $ (++) "Part 2: " $ show $ solvePart2 $  map (fst . head . readP_to_S parseCoord) fileLines
---[(1, 1),    (1, 6),    (8, 3),    (3, 4),    (5, 5),    (8, 9)]
+
 parseCoord :: ReadP (Int,Int)
 parseCoord = do
     x <- liftM read $ munch1 isDigit
