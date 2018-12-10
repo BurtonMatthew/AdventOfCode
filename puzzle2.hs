@@ -30,7 +30,7 @@ countDiffs :: (Eq a) => [a] -> [a] -> Int
 countDiffs xs ys = length $ filter (\(x,y) -> x /= y) $ zip xs ys
 
 orderedIntersection :: (Eq a) => [a] -> [a] -> [a]
-orderedIntersection xs ys = map (\(x,_) -> x) $ filter (\(x,y) -> x == y) $ zip xs ys
+orderedIntersection xs ys = map fst $ filter (\(x,y) -> x == y) $ zip xs ys
 
 combinations :: Int -> [a] -> [[a]]
 combinations 0 _ = [[]]
