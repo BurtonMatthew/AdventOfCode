@@ -7,7 +7,7 @@ import Text.ParserCombinators.ReadP
 main :: IO ()
 main = do
     fileLines <- liftM lines $ readFile "input10.txt"
-    mapM_ putStrLn $ prettyPrint $ solvePart1 $ map (fst . head . readP_to_S parsePosVel) fileLines
+    mapM_ putStrLn $ (++) ["Part 1:"] $ prettyPrint $ solvePart1 $ map (fst . head . readP_to_S parsePosVel) fileLines
     putStrLn $ (++) "Part 2: " $ show $ solvePart2 $ map (fst . head . readP_to_S parsePosVel) fileLines
 
 isDigitOrNegative a = isDigit a || a == '-'
