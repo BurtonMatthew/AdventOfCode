@@ -18,8 +18,6 @@ main = do
     fileLines <- liftM lines (readFile "input13.txt")
     putStrLn $ (++) "Part 1: " $ show $ solvePart1 (parseMap fileLines) []
     putStrLn $ (++) "Part 2: " $ show $ solvePart2 (parseMap fileLines) []
-    --mapM_ putStrLn $ (++) ["Part 1:"] $ printMap $ parseMap $ fileLines
-    --putStrLn $ (++) "Part 2: " $ show $ solvePart2 fileData
 
 parseMap :: [String] -> (MineMap, [Cart])
 parseMap lines = (buildArrayMap, buildCartList) where
