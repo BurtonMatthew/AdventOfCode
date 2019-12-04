@@ -5,7 +5,7 @@ pub fn part1()
 
 pub fn part2()
 {
-    println!("Day 4 Part 2: {}", count_remaining_solutions_part2(6,0,0,1,false,137683,596253));
+    println!("Day 4 Part 2: {}", count_remaining_solutions_part2(6,0,1,0,false,137683,596253));
 }
 
 fn count_remaining_solutions(num_digits_rem: i32, cur_sum: i32, last_digit:i32, has_double: bool, min:i32, max:i32) -> i32
@@ -56,7 +56,7 @@ fn count_remaining_solutions_part2(num_digits_rem: i32, cur_sum: i32, last_digit
     else
     {
         let mut solutions = 0;
-        for i in i32::max(1,last_digit)..10
+        for i in last_digit..10
         {
             solutions += count_remaining_solutions_part2(num_digits_rem-1, (cur_sum * 10) + i, i, if i == last_digit {digit_run+1} else {1}, has_double || (i != last_digit && digit_run == 2), min, max);
         }
