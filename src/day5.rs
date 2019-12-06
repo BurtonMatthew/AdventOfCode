@@ -3,7 +3,7 @@ use std::io::{prelude::*};
 
 pub fn part1()
 {
-    let mut file = File::open("input/day5.txt").expect("Couldn't find day2 input");
+    let mut file = File::open("input/day5.txt").expect("Couldn't find day5 input");
     let mut file_data = String::new();
     file.read_to_string(&mut file_data).expect("Unable to read file");
 
@@ -20,7 +20,7 @@ pub fn part1()
 
 pub fn part2()
 {
-    let mut file = File::open("input/day5.txt").expect("Couldn't find day2 input");
+    let mut file = File::open("input/day5.txt").expect("Couldn't find day5 input");
     let mut file_data = String::new();
     file.read_to_string(&mut file_data).expect("Unable to read file");
 

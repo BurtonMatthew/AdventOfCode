@@ -5,6 +5,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 fn main() 
 {
@@ -19,5 +20,7 @@ fn main()
     day4::part2();
     day5::part1();
     day5::part2();
+    day6::part1();
+    day6::part2();
     println!("Total time: {}ms", now.elapsed().as_millis());
 }
