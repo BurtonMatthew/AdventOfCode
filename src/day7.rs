@@ -5,7 +5,7 @@ use itertools::Itertools;
 
 pub fn part1()
 {
-    let mut file = File::open("input/day7.txt").expect("Couldn't find day5 input");
+    let mut file = File::open("input/day7.txt").expect("Couldn't find day7 input");
     let mut file_data = String::new();
     file.read_to_string(&mut file_data).expect("Unable to read file");
 
@@ -39,7 +39,7 @@ pub fn part1()
 
 pub fn part2()
 {
-    let mut file = File::open("input/day7.txt").expect("Couldn't find day5 input");
+    let mut file = File::open("input/day7.txt").expect("Couldn't find day7 input");
     let mut file_data = String::new();
     file.read_to_string(&mut file_data).expect("Unable to read file");
 
