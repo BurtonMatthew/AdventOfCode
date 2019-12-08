@@ -11,6 +11,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 extern crate itertools;
 
 fn main() 
@@ -30,5 +31,7 @@ fn main()
     day6::part2();
     day7::part1();
     day7::part2();
+    day8::part1();
+    day8::part2();
     println!("Total time: {}ms", now.elapsed().as_millis());
 }
