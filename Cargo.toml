@@ -1,3 +1,6 @@
 [package]
 name = "aoc-2019"
 version = "0.1.0"
+
+[dependencies]
+itertools = "0.8.2"
