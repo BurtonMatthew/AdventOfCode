@@ -24,7 +24,6 @@ pub fn part1()
                     };
 
     let result = (0..5).permutations(5)
-        .into_iter()
         .map(|v| 
             { 
                 let mut signal = 0;
@@ -52,7 +51,6 @@ pub fn part2()
     const NUM_AMPS : usize = 5;
 
     let result = (5..10).permutations(NUM_AMPS)
-        .into_iter()
         .map(|perm|
     {
         let mut amps = vec![Program::from_tape(prog_data.clone()); NUM_AMPS];
