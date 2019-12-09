@@ -102,13 +102,7 @@ impl Program
 {
     pub fn from_tape(tape: Vec<i64>) -> Self
     {
-        let mut new_tape = tape.clone();
-        new_tape.reserve(10000);
-        for _ in 0..10000
-        {
-            new_tape.push(0);
-        }
-        Program { tape: new_tape, istream: Vec::new(), input_index: 0, pc: 0, base: 0 }
+        Program { tape: tape, istream: Vec::new(), input_index: 0, pc: 0, base: 0 }
     }
 
     pub fn push_input(&mut self, input: i64)

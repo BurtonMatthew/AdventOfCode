@@ -8,13 +8,18 @@ pub fn part1()
     let mut file_data = String::new();
     file.read_to_string(&mut file_data).expect("Unable to read file");
 
-    let prog_data : Vec<i64> = file_data.split(",")
+    let mut prog_data : Vec<i64> = file_data.split(",")
                                 .map(|num| num.parse::<i64>())
                                 .filter(|num| num.is_ok())
                                 .map(|num| num.unwrap())
                                 .collect();
+    prog_data.reserve(1000);
+    for _ in 0..1000
+    {
+        prog_data.push(0);
+    }
 
-    let mut prog = Program::from_tape(prog_data.clone());
+    let mut prog = Program::from_tape(prog_data);
     prog.push_input(1);
 
     println!("Day 9 part 1: {}", prog.next().unwrap());
@@ -27,13 +32,19 @@ pub fn part2()
     let mut file_data = String::new();
     file.read_to_string(&mut file_data).expect("Unable to read file");
 
-    let prog_data : Vec<i64> = file_data.split(",")
+    let mut prog_data : Vec<i64> = file_data.split(",")
                                 .map(|num| num.parse::<i64>())
                                 .filter(|num| num.is_ok())
                                 .map(|num| num.unwrap())
                                 .collect();
 
-    let mut prog = Program::from_tape(prog_data.clone());
+    prog_data.reserve(1000);
+    for _ in 0..1000
+    {
+        prog_data.push(0);
+    }
+
+    let mut prog = Program::from_tape(prog_data);
     prog.push_input(2);
 
     println!("Day 9 part 2: {}", prog.next().unwrap());
