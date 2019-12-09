@@ -12,55 +12,79 @@ enum Op
     Halt,
 }
 
-fn to_op(code: i64) -> Op
+impl Op
 {
-    match code
+    fn from_i64(code: i64) -> Self
     {
-        1 => Op::Add,
-        2 => Op::Mul,
-        3 => Op::In,
-        4 => Op::Out,
-        5 => Op::Tjmp,
-        6 => Op::Fjmp,
-        7 => Op::LessThan,
-        8 => Op::Equals,
-        9 => Op::AdjBase,
-        99 => Op::Halt,
-        _ => panic!("Invalid Opcode")
+        match code
+        {
+            1 => Op::Add,
+            2 => Op::Mul,
+            3 => Op::In,
+            4 => Op::Out,
+            5 => Op::Tjmp,
+            6 => Op::Fjmp,
+            7 => Op::LessThan,
+            8 => Op::Equals,
+            9 => Op::AdjBase,
+            99 => Op::Halt,
+            _ => panic!("Invalid Opcode")
+        }
+    }
+
+    fn num_params(&self) -> usize
+    {
+        match self
+        {
+            Op::Add => 2,
+            Op::Mul => 2,
+            Op::In => 0,
+            Op::Out => 1,
+            Op::Tjmp => 2,
+            Op::Fjmp => 2,
+            Op::LessThan => 2,
+            Op::Equals => 2,
+            Op::AdjBase => 1,
+            Op::Halt => 0,
+        }
+    }
+
+    fn has_output(&self) -> bool
+    {
+        match self
+        {
+            Op::Add => true,
+            Op::Mul => true,
+            Op::In => true,
+            Op::Out => false,
+            Op::Tjmp => false,
+            Op::Fjmp => false,
+            Op::LessThan => true,
+            Op::Equals => true,
+            Op::Halt => false,
+            Op::AdjBase => false,
+        }
     }
 }
 
-fn num_params(op: &Op) -> usize
+enum AddrMode
 {
-    match op
-    {
-        Op::Add => 2,
-        Op::Mul => 2,
-        Op::In => 0,
-        Op::Out => 1,
-        Op::Tjmp => 2,
-        Op::Fjmp => 2,
-        Op::LessThan => 2,
-        Op::Equals => 2,
-        Op::AdjBase => 1,
-        Op::Halt => 0,
-    }
+    Position,
+    Immediate,
+    Relative,
 }
 
-fn has_output(op: &Op) -> bool
+impl AddrMode
 {
-    match op
+    fn from_i64(mode: i64) -> Self
     {
-        Op::Add => true,
-        Op::Mul => true,
-        Op::In => true,
-        Op::Out => false,
-        Op::Tjmp => false,
-        Op::Fjmp => false,
-        Op::LessThan => true,
-        Op::Equals => true,
-        Op::Halt => false,
-        Op::AdjBase => false,
+        match mode
+        {
+            0 => AddrMode::Position,
+            1 => AddrMode::Immediate,
+            2 => AddrMode::Relative,
+            _ => panic!("Invalid Addressing Mode"),
+        }
     }
 }
 
@@ -102,29 +126,33 @@ impl Iterator for Program
         {
             // read opcode
             let mut opcode = self.tape[self.pc];
-            let op = to_op(opcode % 100);
+            let op = Op::from_i64(opcode % 100);
             opcode /= 100;
             self.pc += 1;
 
             // read params
             let mut params : [i64; 2] = [0;2];
-            for i in 0..num_params(&op)
+            for i in 0..op.num_params()
             {
-                params[i] = match opcode % 10
+                params[i] = match AddrMode::from_i64(opcode % 10)
                             { 
-                                0 => self.tape[self.tape[self.pc] as usize], 
-                                1 => self.tape[self.pc] ,
-                                2 => self.tape[(self.tape[self.pc] + self.base) as usize],
-                                _ => panic!("invalid addressing mode")
+                                AddrMode::Position => self.tape[self.tape[self.pc] as usize], 
+                                AddrMode::Immediate => self.tape[self.pc] ,
+                                AddrMode::Relative => self.tape[(self.tape[self.pc] + self.base) as usize],
                             };
                 opcode /= 10;
                 self.pc += 1;
             }
 
             // read destination
-            let out_index = if has_output(&op) 
+            let out_index = if op.has_output()
                             { 
-                                let index = if opcode % 10 == 0 { self.tape[self.pc] } else { self.tape[self.pc] + self.base };
+                                let index = match AddrMode::from_i64(opcode % 10) 
+                                            { 
+                                                AddrMode::Position => self.tape[self.pc],
+                                                AddrMode::Relative => self.tape[self.pc] + self.base,
+                                                AddrMode::Immediate => panic!("Cannot Access Destination Param By Immediate Mode"),
+                                            };
                                 self.pc += 1;
                                 index
                             } 
