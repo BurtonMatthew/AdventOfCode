@@ -8,10 +8,11 @@ enum Op
     Fjmp,
     LessThan,
     Equals,
-    Halt
+    AdjBase,
+    Halt,
 }
 
-fn to_op(code: i32) -> Op
+fn to_op(code: i64) -> Op
 {
     match code
     {
@@ -23,6 +24,7 @@ fn to_op(code: i32) -> Op
         6 => Op::Fjmp,
         7 => Op::LessThan,
         8 => Op::Equals,
+        9 => Op::AdjBase,
         99 => Op::Halt,
         _ => panic!("Invalid Opcode")
     }
@@ -40,6 +42,7 @@ fn num_params(op: &Op) -> usize
         Op::Fjmp => 2,
         Op::LessThan => 2,
         Op::Equals => 2,
+        Op::AdjBase => 1,
         Op::Halt => 0,
     }
 }
@@ -57,26 +60,34 @@ fn has_output(op: &Op) -> bool
         Op::LessThan => true,
         Op::Equals => true,
         Op::Halt => false,
+        Op::AdjBase => false,
     }
 }
 
 #[derive(Clone)]
 pub struct Program
 {
-    tape: Vec<i32>,
-    istream: Vec<i32>,
+    tape: Vec<i64>,
+    istream: Vec<i64>,
     input_index: usize,
-    pc: usize
+    pc: usize,
+    base: i64
 }
 
 impl Program
 {
-    pub fn from_tape(tape: Vec<i32>) -> Self
+    pub fn from_tape(tape: Vec<i64>) -> Self
     {
-        Program { tape: tape, istream: Vec::new(), input_index: 0, pc: 0 }
+        let mut new_tape = tape.clone();
+        new_tape.reserve(10000);
+        for _ in 0..10000
+        {
+            new_tape.push(0);
+        }
+        Program { tape: new_tape, istream: Vec::new(), input_index: 0, pc: 0, base: 0 }
     }
 
-    pub fn push_input(&mut self, input: i32)
+    pub fn push_input(&mut self, input: i64)
     {
         self.istream.push(input);
     }
@@ -84,8 +95,8 @@ impl Program
 
 impl Iterator for Program
 {
-    type Item = i32;
-    fn next(&mut self) -> Option<i32>
+    type Item = i64;
+    fn next(&mut self) -> Option<i64>
     {
         loop
         {
@@ -96,10 +107,16 @@ impl Iterator for Program
             self.pc += 1;
 
             // read params
-            let mut params : [i32; 2] = [0;2];
+            let mut params : [i64; 2] = [0;2];
             for i in 0..num_params(&op)
             {
-                params[i] = if opcode % 10 == 0 { self.tape[self.tape[self.pc] as usize] } else { self.tape[self.pc] };
+                params[i] = match opcode % 10
+                            { 
+                                0 => self.tape[self.tape[self.pc] as usize], 
+                                1 => self.tape[self.pc] ,
+                                2 => self.tape[(self.tape[self.pc] + self.base) as usize],
+                                _ => panic!("invalid addressing mode")
+                            };
                 opcode /= 10;
                 self.pc += 1;
             }
@@ -107,7 +124,7 @@ impl Iterator for Program
             // read destination
             let out_index = if has_output(&op) 
                             { 
-                                let index = self.tape[self.pc];
+                                let index = if opcode % 10 == 0 { self.tape[self.pc] } else { self.tape[self.pc] + self.base };
                                 self.pc += 1;
                                 index
                             } 
@@ -123,6 +140,7 @@ impl Iterator for Program
                 Op::Fjmp => if params[0] == 0 { self.pc = params[1] as usize; },
                 Op::LessThan => self.tape[out_index] = if params[0] < params[1] { 1 } else { 0 },
                 Op::Equals => self.tape[out_index] = if params[0] == params[1] { 1 } else { 0 },
+                Op::AdjBase => self.base += params[0],
                 Op::Halt => return None,
             }
         }

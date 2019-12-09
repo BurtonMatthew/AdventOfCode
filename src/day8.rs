@@ -37,7 +37,6 @@ pub fn part2()
 
     println!("Day 8 part 2:");
     composite.chunks(25)
-        .map(|chunk| println!("{}", chunk.iter().map(|c| match *c as char {'0' => ' ', '1' => '#', _ => '.'}).collect::<String>()) )
-        .for_each(drop);
+        .for_each(|chunk| println!("{}", chunk.iter().map(|c| match *c as char {'0' => ' ', _ => '*'}).collect::<String>()) )
 
 }
