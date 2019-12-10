@@ -78,7 +78,7 @@ pub fn part2(station: (i32, i32))
         let dy = station.1 - a1.1;
         let dx = station.0 - a1.0;
         let gcd = gcd(dx.abs(),dy.abs());
-        let key = (dy / gcd, dx / gcd);
+        let key = (dx / gcd, dy / gcd);
         if let Some(vec) = angle_map.get_mut(&key)
         {
             vec.push(a1);
@@ -99,7 +99,7 @@ pub fn part2(station: (i32, i32))
     let mut angle_vec : Vec<(&(i32,i32), &mut Vec<(i32,i32)>)> = angle_map.iter_mut().collect();
     angle_vec.sort_by(|(key1, _), (key2, _)|
     {
-        angle(key1.1, key1.0).partial_cmp(&angle(key2.1, key2.0)).unwrap()
+        angle(key1.0, key1.1).partial_cmp(&angle(key2.0, key2.1)).unwrap()
     });
 
     // Round robin through the sublists removing elements
