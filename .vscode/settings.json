@@ -1,4 +1,4 @@
 {
-    "rust-client.channel": "nightly",
-    "rust.unstable_features": true
+    "rust-client.channel": "stable",
+    "rust.unstable_features": false
 }

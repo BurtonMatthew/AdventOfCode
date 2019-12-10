@@ -13,6 +13,7 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
+mod day10;
 extern crate itertools;
 
 fn main() 
@@ -36,5 +37,7 @@ fn main()
     day8::part2();
     day9::part1();
     day9::part2();
+    let station = day10::part1();
+    day10::part2(station);
     println!("Total time: {}ms", now.elapsed().as_millis());
 }
