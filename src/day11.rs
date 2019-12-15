@@ -1,5 +1,3 @@
-use std::fs::File;
-use std::io::{prelude::*};
 use intcode::Program;
 use std::collections::HashMap;
 
@@ -8,12 +6,8 @@ const EAST : i32 = 1;
 const SOUTH : i32 = 2;
 const WEST : i32 = 3;
 
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day11.txt").expect("Couldn't find day11 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-    
     let mut prog_data : Vec<i64> = file_data.split(",")
                                 .map(|num| num.parse::<i64>())
                                 .filter(|num| num.is_ok())
@@ -69,12 +63,8 @@ pub fn part1()
     println!("Day 11 part 1: {}", panels.len());
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day11.txt").expect("Couldn't find day11 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-    
     let mut prog_data : Vec<i64> = file_data.split(",")
                                 .map(|num| num.parse::<i64>())
                                 .filter(|num| num.is_ok())

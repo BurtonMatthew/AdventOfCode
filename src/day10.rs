@@ -1,14 +1,8 @@
-use std::fs::File;
-use std::io::{prelude::*};
 use std::collections::HashSet;
 use std::collections::HashMap;
 
-pub fn part1() -> (i32,i32)
+pub fn part1(file_data: &str) -> (i32,i32)
 {
-    let mut file = File::open("input/day10.txt").expect("Couldn't find day10 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-    
     let mut asteroids = HashSet::new();
 
     let mut x : i32;
@@ -45,12 +39,8 @@ pub fn part1() -> (i32,i32)
     (best_visible.1, best_visible.2)
 }
 
-pub fn part2(station: (i32, i32))
+pub fn part2(file_data: &str, station: (i32, i32))
 {
-    let mut file = File::open("input/day10.txt").expect("Couldn't find day10 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
     // Parse the asteroid map
     let mut asteroids = HashSet::new();
 

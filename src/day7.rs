@@ -1,14 +1,8 @@
-use std::fs::File;
-use std::io::{prelude::*};
 use intcode::Program;
 use itertools::Itertools;
 
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day7.txt").expect("Couldn't find day7 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
     let prog_data : Vec<i64> = file_data.split(",")
                                 .map(|num| num.parse::<i64>())
                                 .filter(|num| num.is_ok())
@@ -37,12 +31,8 @@ pub fn part1()
     println!("Day 7 Part 1: {}", result);
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day7.txt").expect("Couldn't find day7 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
     let prog_data : Vec<i64> = file_data.split(",")
                                 .map(|num| num.parse::<i64>())
                                 .filter(|num| num.is_ok())

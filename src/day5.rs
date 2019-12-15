@@ -1,14 +1,8 @@
-use std::fs::File;
-use std::io::{prelude::*};
-use intcode;
+use intcode::Program;
 
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day5.txt").expect("Couldn't find day5 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
-    let mut program = intcode::Program::from_tape(file_data.split(",")
+    let mut program = Program::from_tape(file_data.split(",")
                                                 .map(|num| num.parse::<i64>())
                                                 .filter(|num| num.is_ok())
                                                 .map(|num| num.unwrap())
@@ -19,13 +13,9 @@ pub fn part1()
 
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day5.txt").expect("Couldn't find day5 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
-    let mut program = intcode::Program::from_tape(file_data.split(",")
+    let mut program = Program::from_tape(file_data.split(",")
                                                 .map(|num| num.parse::<i64>())
                                                 .filter(|num| num.is_ok())
                                                 .map(|num| num.unwrap())

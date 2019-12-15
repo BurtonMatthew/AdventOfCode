@@ -1,21 +1,12 @@
-use std::fs::File;
-use std::io::{prelude::*};
-
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day3.txt").expect("Couldn't find day3 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
     let wires : Vec<Vec<Line>> = file_data.lines().map(|l| parse_wire(&l)).collect();
 
     println!("Day 3 Part 1: {}", closest_intersection_manhattan(&find_intersections(&wires[0], &wires[1])));
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day3.txt").expect("Couldn't find day3 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
     let wires : Vec<Vec<Line>> = file_data.lines().map(|l| parse_wire(&l)).collect();
 
     println!("Day 3 Part 2: {}", closest_intersection_wire(&wires[0], &wires[1], &find_intersections(&wires[0], &wires[1])));

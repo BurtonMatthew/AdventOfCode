@@ -95,19 +95,32 @@ pub struct Program
     istream: Vec<i64>,
     input_index: usize,
     pc: usize,
-    base: i64
+    base: i64,
+    halted: bool,
+    awaiting_input: bool,
 }
 
 impl Program
 {
     pub fn from_tape(tape: Vec<i64>) -> Self
     {
-        Program { tape: tape, istream: Vec::new(), input_index: 0, pc: 0, base: 0 }
+        Program { tape: tape, istream: Vec::new(), input_index: 0, pc: 0, base: 0, halted: false, awaiting_input: false }
     }
 
     pub fn push_input(&mut self, input: i64)
     {
         self.istream.push(input);
+        self.awaiting_input = false;
+    }
+
+    pub fn needs_input(&self) -> bool 
+    { 
+        self.awaiting_input 
+    }
+
+    pub fn _read_at(&self, index: usize) -> i64
+    {
+        self.tape[index]
     }
 }
 
@@ -116,6 +129,7 @@ impl Iterator for Program
     type Item = i64;
     fn next(&mut self) -> Option<i64>
     {
+        if self.halted || self.awaiting_input { return None }
         loop
         {
             // read opcode
@@ -156,14 +170,15 @@ impl Iterator for Program
             {
                 Op::Add => self.tape[out_index] = params[0] + params[1],
                 Op::Mul => self.tape[out_index] = params[0] * params[1],
-                Op::In =>  { self.tape[out_index] = self.istream[self.input_index]; self.input_index +=1; },
+                Op::In =>  if self.input_index < self.istream.len() { self.tape[out_index] = self.istream[self.input_index]; self.input_index +=1; }
+                           else { self.awaiting_input = true; self.pc -= 2; return None},
                 Op::Out => return Some(params[0]),
                 Op::Tjmp => if params[0] != 0 { self.pc = params[1] as usize; },
                 Op::Fjmp => if params[0] == 0 { self.pc = params[1] as usize; },
                 Op::LessThan => self.tape[out_index] = if params[0] < params[1] { 1 } else { 0 },
                 Op::Equals => self.tape[out_index] = if params[0] == params[1] { 1 } else { 0 },
                 Op::AdjBase => self.base += params[0],
-                Op::Halt => return None,
+                Op::Halt => { self.halted = true; return None },
             }
         }
     }

@@ -1,29 +1,21 @@
-use std::fs::File;
-use std::io::{prelude::*};
 use std::collections::HashMap;
 
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day6.txt").expect("Couldn't find day6 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-    let map = orbiters_map(&file_data);
+    let map = orbiters_map(file_data);
 
     println!("Day 6 Part 1: {}", orbit_checksum(&map, "COM", 0));
 
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day6.txt").expect("Couldn't find day6 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
     let map = orbit_map(&file_data);
 
     println!("Day 6 Part 2: {}", min_transfers(&map));
 }
 
-fn orbiters_map(data: &String) -> HashMap<&str, Vec<&str>>
+fn orbiters_map(data: &str) -> HashMap<&str, Vec<&str>>
 {
     let mut map : HashMap<&str, Vec<&str>> = HashMap::new();
     for line in data.lines()
@@ -54,7 +46,7 @@ fn orbit_checksum(map: &HashMap<&str, Vec<&str>>, root: &str, depth: u32) -> u32
     }
 }
 
-fn orbit_map(data: &String) -> HashMap<&str, &str>
+fn orbit_map(data: &str) -> HashMap<&str, &str>
 {
     let mut map : HashMap<&str, &str> = HashMap::new();
     for line in data.lines()

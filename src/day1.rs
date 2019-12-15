@@ -1,23 +1,16 @@
-use std::fs::File;
-use std::io::{prelude::*, BufReader};
-
-pub fn part1()
+pub fn part1(buf : &str)
 {
-    let file = File::open("input/day1.txt").expect("Couldn't find day1 input");
-    let buf = BufReader::new(file);
     println!("Day 1 Part 1: {}",
         buf.lines()
-            .map(|line| fuel_requirement(line.unwrap().parse::<u32>().unwrap()))
+            .map(|line| fuel_requirement(line.parse::<u32>().unwrap()))
             .sum::<u32>());
 }
 
-pub fn part2()
+pub fn part2(buf : &str)
 {
-    let file = File::open("input/day1.txt").expect("Couldn't find day1 input");
-    let buf = BufReader::new(file);
     println!("Day 1 Part 2: {}",
         buf.lines()
-            .map(|line| wetmass_requirement(line.unwrap().parse::<u32>().unwrap()))
+            .map(|line| wetmass_requirement(line.parse::<u32>().unwrap()))
             .sum::<u32>());
 }
 

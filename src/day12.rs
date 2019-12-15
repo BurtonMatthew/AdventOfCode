@@ -1,13 +1,7 @@
-use std::fs::File;
-use std::io::{prelude::*};
 use itertools::Itertools;
 
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day12.txt").expect("Couldn't find day12 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-    
     let mut meteors_pos : Vec<Vec3> = file_data.chars()
                                 .map(|c| if c == '\n' { ',' } else { c })
                                 .filter(|c| *c == ',' || *c == '-' || (*c >= '0' && *c <= '9'))
@@ -55,12 +49,8 @@ pub fn part1()
     println!("Day 12 part 1: {}", energy);
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day12.txt").expect("Couldn't find day12 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-    
     let meteors_start_pos : Vec<Vec3> = file_data.chars()
                                 .map(|c| if c == '\n' { ',' } else { c })
                                 .filter(|c| *c == ',' || *c == '-' || (*c >= '0' && *c <= '9'))
@@ -174,9 +164,10 @@ impl std::ops::Index<usize> for Vec3
     }
 }
 
-fn gcd(mut a: i64, mut b: i64) -> i64 
+fn gcd<T>(mut a: T, mut b: T) -> T 
+    where T : num::Integer + Copy,
 {
-    while b != 0 
+    while b != T::zero()
     {
         let tmp = a;
         a = b;

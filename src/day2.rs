@@ -1,12 +1,7 @@
-use std::fs::File;
-use std::io::{prelude::*};
+use intcode::Program;
 
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day2.txt").expect("Couldn't find day2 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
     println!("Day 2 Part 1: {}",
         run_program(set_inputs(12, 2, file_data.split(",")
                                                     .map(|num| num.parse::<i32>())
@@ -16,22 +11,25 @@ pub fn part1()
 
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day2.txt").expect("Couldn't find day2 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-    let program = file_data.split(",")
-                            .map(|num| num.parse::<i32>())
+    let mut prog_data = file_data.split(",")
+                            .map(|num| num.parse::<i64>())
                             .filter(|num| num.is_ok())
                             .map(|num| num.unwrap())
-                            .collect::<Vec<i32>>();
+                            .collect::<Vec<i64>>();
 
     for noun in 1..99
     {
         for verb in 1..99
         {
-            if run_program(set_inputs(noun, verb, program.clone())).unwrap()[0] == 19690720
+            prog_data[1] = noun;
+            prog_data[2] = verb;
+
+            let new_data = prog_data.clone();
+            let ouput = &prog_data[0];
+            Program::from_tape(new_data).next();
+            if *ouput == 19690720
             {
                 println!("Day 2 Part 2: {}", noun * 100 + verb);
                 return;

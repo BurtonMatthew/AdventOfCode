@@ -1,12 +1,5 @@
-use std::fs::File;
-use std::io::{prelude::*};
-
-pub fn part1()
+pub fn part1(file_data: &str)
 {
-    let mut file = File::open("input/day8.txt").expect("Couldn't find day8 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
     let best = file_data.as_bytes().chunks(25 * 6)
         .map(|chunk| 
         {
@@ -21,12 +14,8 @@ pub fn part1()
     
 }
 
-pub fn part2()
+pub fn part2(file_data: &str)
 {
-    let mut file = File::open("input/day8.txt").expect("Couldn't find day8 input");
-    let mut file_data = String::new();
-    file.read_to_string(&mut file_data).expect("Unable to read file");
-
     let composite : Vec<u8> = file_data.as_bytes().chunks(25 * 6)
         .fold(vec!['2' as u8; 25*6], |comp, layer|
         {
