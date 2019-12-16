@@ -6,12 +6,10 @@ pub fn part1(file_data: &str)
 
     for _ in 0..100
     {
-        let mut new_signal = signal.clone();
         for i in 0..signal.len()
         {
-            new_signal[i] = calc_digit(i+1, &signal);
+            signal[i] = calc_digit(i+1, &signal);
         }
-        signal = new_signal;
     }
 
     println!("Day 16 part 1: {:08}", signal.iter().take(8).fold(0, |s, i| s*10 + i));
