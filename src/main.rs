@@ -18,6 +18,7 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 extern crate itertools;
 extern crate num;
 
@@ -55,7 +56,9 @@ fn main()
     day14::part2(files[13].trim());
     let mut map = day15::part1(files[14].trim());
     day15::part2(&mut map);
-    day16::part1(files[15].trim());
-    day16::part2(files[15].trim());
+    //day16::part1(files[15].trim());
+    //day16::part2(files[15].trim());
+    day17::part1(files[16].trim());
+    day17::part2(files[16].trim());
     println!("Total time: {}ms", now.elapsed().as_millis());
 }
