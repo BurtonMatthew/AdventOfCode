@@ -35,7 +35,7 @@ pub fn part1(file_data: &str)
     }
 
 
-    println!("Day 16 part 1: {}", sum_alignment);
+    println!("Day 17 part 1: {}", sum_alignment);
 }
 
 pub fn part2(file_data: &str)
@@ -54,10 +54,10 @@ pub fn part2(file_data: &str)
     prog_data[0] = 2;
     let mut program = Program::from_tape(prog_data);
 
-    program.push_input('n' as i64);
-    program.push_input('\n' as i64);
+    // Hand-solved solution: algorithm is going to be follow path to end before turning, then do a RLE based compression algorithm
+    "A,B,A,C,A,B,A,C,B,C\nR,4,L,12,L,8,R,4\nL,8,R,10,R,10,R,6\nR,4,R,10,L,12\nn\n".chars().for_each(|c| program.push_input(c as i64));
 
-    println!("Day 16 part 2: {}", program.next().unwrap());
+    println!("Day 17 part 2: {}", program.last().unwrap());
 }
 
 /*
@@ -102,4 +102,11 @@ pub fn part2(file_data: &str)
 ..............#..............................
 ..............#..............................
 ..............#############..................
+*/
+
+/*
+A B A C A B A C B C
+R 4 L 12 L 8 R 4
+L 8 R 10 R 10 R 6
+R 4 R 10 L 12
 */
