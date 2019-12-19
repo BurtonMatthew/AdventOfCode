@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 enum Op
 {
     Add,
@@ -92,8 +94,7 @@ impl AddrMode
 pub struct Program
 {
     tape: Vec<i64>,
-    istream: Vec<i64>,
-    input_index: usize,
+    istream: VecDeque<i64>,
     pc: usize,
     base: i64,
     halted: bool,
@@ -104,12 +105,12 @@ impl Program
 {
     pub fn from_tape(tape: Vec<i64>) -> Self
     {
-        Program { tape: tape, istream: Vec::new(), input_index: 0, pc: 0, base: 0, halted: false, awaiting_input: false }
+        Program { tape: tape, istream: VecDeque::new(), pc: 0, base: 0, halted: false, awaiting_input: false }
     }
 
     pub fn push_input(&mut self, input: i64)
     {
-        self.istream.push(input);
+        self.istream.push_back(input);
         self.awaiting_input = false;
     }
 
@@ -170,7 +171,7 @@ impl Iterator for Program
             {
                 Op::Add => self.tape[out_index] = params[0] + params[1],
                 Op::Mul => self.tape[out_index] = params[0] * params[1],
-                Op::In =>  if self.input_index < self.istream.len() { self.tape[out_index] = self.istream[self.input_index]; self.input_index +=1; }
+                Op::In =>  if let Some(input) = self.istream.pop_front() { self.tape[out_index] = input; }
                            else { self.awaiting_input = true; self.pc -= 2; return None},
                 Op::Out => return Some(params[0]),
                 Op::Tjmp => if params[0] != 0 { self.pc = params[1] as usize; },
