@@ -7,7 +7,7 @@ pub fn part1(file_data: &str)
                                 .filter(|num| num.is_ok())
                                 .map(|num| num.unwrap())
                                 .collect();
-    prog_data.reserve(1000);
+    prog_data.reserve(100);
     for _ in 0..100
     {
         prog_data.push(0);
@@ -35,7 +35,7 @@ pub fn part2(file_data: &str)
                                 .filter(|num| num.is_ok())
                                 .map(|num| num.unwrap())
                                 .collect();
-    prog_data.reserve(1000);
+    prog_data.reserve(100);
     for _ in 0..100
     {
         prog_data.push(0);
@@ -54,19 +54,20 @@ pub fn part2(file_data: &str)
     let mut x : usize = 0;
     loop
     {
-        // step back in x to account for widening beam
-        x = x.saturating_sub(1);
-        
         // advance till we're in the beam
         while !get(x,y)
         {
             x += 1;
         }
+
+        // check the square corners
         if get(x+99, y) && get(x, y-99) && get (x+99, y-99)
         {
             println!("Day 19 part 2: {}", (x * 10000) + y - 99);
             break;
         }
+
+        // try next line
         y += 1;
     }
 

@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::collections::VecDeque;
 
 enum Op
@@ -119,7 +120,7 @@ impl Program
         self.awaiting_input 
     }
 
-    pub fn _read_at(&self, index: usize) -> i64
+    pub fn read_at(&self, index: usize) -> i64
     {
         self.tape[index]
     }
