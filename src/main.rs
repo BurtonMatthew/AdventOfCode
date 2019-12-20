@@ -64,8 +64,8 @@ fn main()
     //day16::part2(files[15].trim());
     day17::part1(files[16].trim());
     day17::part2(files[16].trim());
-    //day18::part1(files[17].trim());
-    //day18::part2(files[17].trim());
+    day18::part1(files[17].trim());
+    day18::part2(files[17].trim());
     day19::part1(files[18].trim());
     day19::part2(files[18].trim());
     println!("Total time: {}ms", now.elapsed().as_millis());

@@ -25,7 +25,7 @@ impl<T> Index<(usize, usize)> for Vec2<T>
 
     fn index(&self, pos: (usize, usize)) -> &T
     {
-        &self[pos.0][pos.1]
+        &self[pos.1][pos.0]
     }
 }
 
@@ -43,7 +43,7 @@ impl<T> IndexMut<(usize, usize)> for Vec2<T>
 {
     fn index_mut(&mut self, pos: (usize, usize)) -> &mut T
     {
-        &mut self[pos.0][pos.1]
+        &mut self[pos.1][pos.0]
     }
 }
 
@@ -86,5 +86,41 @@ impl<T> Vec2<T>
             self.width = row.len();
         }
         self.data.extend(row);
+    }
+
+    pub fn rows(&self) -> RowIter<T>
+    {
+        RowIter { vec: self, index: 0 }
+    }
+
+    // Easier Impl
+    //pub fn row(&self) -> std::slice::Chunks<T>
+    //{
+    //    self.data.chunks(self.width())
+    //}
+}
+
+pub struct RowIter<'a, T:'a>
+{
+    vec: &'a Vec2<T>,
+    index: usize
+}
+
+impl<'a, T> Iterator for RowIter<'a, T>
+{
+    type Item = &'a[T];
+
+    fn next(&mut self) -> Option<&'a[T]>
+    {
+        if self.index < self.vec.height()
+        {
+            let result = Some(&self.vec[self.index]);
+            self.index += 1;
+            result
+        }
+        else
+        {
+            None
+        }
     }
 }
