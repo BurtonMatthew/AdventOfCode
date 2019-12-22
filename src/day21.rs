@@ -41,5 +41,5 @@ pub fn part2(file_data: &str)
         RUN
         ").chars().for_each(|c| prog.push_input(c as i64));
 
-    println!("Day 22 part 2: {}", prog.last().unwrap());
+    println!("Day 21 part 2: {}", prog.last().unwrap());
 }
