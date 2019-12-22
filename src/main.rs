@@ -24,6 +24,10 @@ mod day18;
 mod day19;
 mod day20;
 mod day21;
+mod day22;
+mod day23;
+mod day24;
+mod day25;
 extern crate itertools;
 extern crate num;
 extern crate pathfinding;
@@ -74,5 +78,13 @@ fn main()
     day20::part2(&files[19]);
     day21::part1(files[20].trim());
     day21::part2(files[20].trim());
+    day22::part1(files[21].trim());
+    day22::part2(files[21].trim());
+    day23::part1(files[22].trim());
+    day23::part2(files[22].trim());
+    day24::part1(files[23].trim());
+    day24::part2(files[23].trim());
+    day25::part1(files[24].trim());
+    day25::part2(files[24].trim());
     println!("Total time: {}ms", now.elapsed().as_millis());
 }
