@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use std::collections::VecDeque;
+use std::num::ParseIntError;
 
 enum Op
 {
@@ -109,6 +110,11 @@ impl Program
         Program { tape: tape, istream: VecDeque::new(), pc: 0, base: 0, halted: false, awaiting_input: false }
     }
 
+    pub fn extend_tape(&mut self, len: usize)
+    {
+        self.tape.extend(std::iter::repeat(0).take(len));
+    }
+
     pub fn push_input(&mut self, input: i64)
     {
         self.istream.push_back(input);
@@ -123,6 +129,20 @@ impl Program
     pub fn read_at(&self, index: usize) -> i64
     {
         self.tape[index]
+    }
+}
+
+
+impl std::str::FromStr for Program
+{
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, ParseIntError>
+    {
+        s.split(",")
+        .map(|num| num.parse::<i64>())
+        .collect::<Result<Vec<_>,_>>()
+        .map(|tape| Self { tape: tape, istream: VecDeque::new(), pc: 0, base: 0, halted: false, awaiting_input: false })
     }
 }
 

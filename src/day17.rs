@@ -2,18 +2,9 @@ use intcode::Program;
 
 pub fn part1(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(1000);
-    for _ in 0..10000
-    {
-        prog_data.push(0);
-    }
-
-    let program = Program::from_tape(prog_data);
+    let mut program : Program = file_data.parse().unwrap();
+    program.extend_tape(10000);
+    
     let map = program.map(|i| char::from(i as u8)).collect::<Vec<_>>().split(|c| *c == '\n').map(|l| l.to_vec()).filter(|v| v.len() > 0).collect::<Vec<Vec<_>>>();
     let width = map[0].len();
     let height = map.len();

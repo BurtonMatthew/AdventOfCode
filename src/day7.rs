@@ -3,15 +3,11 @@ use itertools::Itertools;
 
 pub fn part1(file_data: &str)
 {
-    let prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
+    let proto_prog: Program = file_data.parse().unwrap();
 
     let amplifier = |phase, signal| 
                     { 
-                        let mut prog = Program::from_tape(prog_data.clone());
+                        let mut prog = proto_prog.clone();
                         prog.push_input(phase);
                         prog.push_input(signal);
                         prog.next().unwrap()
@@ -33,17 +29,14 @@ pub fn part1(file_data: &str)
 
 pub fn part2(file_data: &str)
 {
-    let prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
+    let proto_prog: Program = file_data.parse().unwrap();
+
     const NUM_AMPS : usize = 5;
 
     let result = (5..10).permutations(NUM_AMPS)
         .map(|perm|
     {
-        let mut amps = vec![Program::from_tape(prog_data.clone()); NUM_AMPS];
+        let mut amps = vec![proto_prog.clone(); NUM_AMPS];
         for i in 0..NUM_AMPS
         {
             amps[i].push_input(perm[i]);

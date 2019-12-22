@@ -11,19 +11,11 @@ const OXYGEN : i64 = 2;
 
 pub fn part1(file_data: &str) -> HashMap<(i32,i32),i32>
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(1000);
-    for _ in 0..1000
-    {
-        prog_data.push(0);
-    }
+    let mut robot : Program = file_data.parse().unwrap();
+    robot.extend_tape(1000);
 
     let mut map = HashMap::new();
-    println!("Day 15 part 1: {}", fastest_oxygen(&mut Program::from_tape(prog_data), &mut map, (0,0), 0));
+    println!("Day 15 part 1: {}", fastest_oxygen(&mut robot, &mut map, (0,0), 0));
     map
 }
 

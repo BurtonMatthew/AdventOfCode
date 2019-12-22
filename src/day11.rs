@@ -8,18 +8,9 @@ const WEST : i32 = 3;
 
 pub fn part1(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(1000);
-    for _ in 0..1000
-    {
-        prog_data.push(0);
-    }
+    let mut robot : Program = file_data.parse().unwrap();
+    robot.extend_tape(1000);
 
-    let mut robot = Program::from_tape(prog_data);
     let mut robot_pos = (0,0);
     let mut robot_dir = NORTH;
     let mut panels = HashMap::new();
@@ -65,18 +56,9 @@ pub fn part1(file_data: &str)
 
 pub fn part2(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(1000);
-    for _ in 0..1000
-    {
-        prog_data.push(0);
-    }
+    let mut robot : Program = file_data.parse().unwrap();
+    robot.extend_tape(1000);
 
-    let mut robot = Program::from_tape(prog_data);
     let mut robot_pos = (0,0);
     let mut robot_dir = NORTH;
     let mut panels = HashMap::new();

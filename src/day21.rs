@@ -2,18 +2,8 @@ use intcode::Program;
 
 pub fn part1(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(100);
-    for _ in 0..100
-    {
-        prog_data.push(0);
-    }
-
-    let mut prog = Program::from_tape(prog_data);
+    let mut prog : Program = file_data.parse().unwrap();
+    prog.extend_tape(100);
 
     // !(A && B && C) && D
     String::from(
@@ -32,18 +22,8 @@ pub fn part1(file_data: &str)
 
 pub fn part2(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(100);
-    for _ in 0..100
-    {
-        prog_data.push(0);
-    }
-
-    let mut prog = Program::from_tape(prog_data);
+    let mut prog : Program = file_data.parse().unwrap();
+    prog.extend_tape(100);
 
     // !(A && B && C) && D && (E || H)
     String::from(

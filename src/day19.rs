@@ -2,23 +2,15 @@ use intcode::Program;
 
 pub fn part1(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(100);
-    for _ in 0..100
-    {
-        prog_data.push(0);
-    }
+    let mut proto_program : Program = file_data.parse().unwrap();
+    proto_program.extend_tape(100);
 
     let mut sum = 0;
     for x in 0..50
     {
         for y in 0..50
         {
-            let mut program = Program::from_tape(prog_data.clone());
+            let mut program = proto_program.clone();
             program.push_input(x);
             program.push_input(y);
             sum += program.next().unwrap();
@@ -30,20 +22,12 @@ pub fn part1(file_data: &str)
 
 pub fn part2(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(100);
-    for _ in 0..100
-    {
-        prog_data.push(0);
-    }
+    let mut proto_program : Program = file_data.parse().unwrap();
+    proto_program.extend_tape(100);
 
     let get = |x,y| 
     {
-        let mut program = Program::from_tape(prog_data.clone());
+        let mut program = proto_program.clone();
         program.push_input(x as i64);
         program.push_input(y as i64);
         program.next().unwrap() == 1

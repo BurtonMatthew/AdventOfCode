@@ -2,19 +2,9 @@ use intcode::Program;
 
 pub fn part1(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-        .map(|num| num.parse::<i64>())
-        .filter(|num| num.is_ok())
-        .map(|num| num.unwrap())
-        .collect();
+    let mut breakout : Program = file_data.parse().unwrap();
+    breakout.extend_tape(1000);
 
-    prog_data.reserve(1000);
-    for _ in 0..1000
-    {
-        prog_data.push(0);
-    }
-
-    let mut breakout = Program::from_tape(prog_data);
     let mut blocks = 0;
     loop
     {
