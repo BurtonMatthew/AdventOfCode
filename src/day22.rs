@@ -1,3 +1,5 @@
+use modular::ModInteger;
+
 pub fn part1(file_data: &str)
 {
     let mut deck = (0..10007).collect();
@@ -7,22 +9,46 @@ pub fn part1(file_data: &str)
 
 pub fn part2(file_data: &str)
 {
-    let deck_size : i128 = 119315717514047;
-    let step = |i| { file_data.lines().rev().fold(i, |p, l| undo_parse_line(p, deck_size, l)) };
+    const DECK_SIZE : i128 = 119315717514047;
+    let step = |i| { file_data.lines().rev().fold(i, |p, l| undo_parse_line(p, DECK_SIZE, l)) };
     let pos_0 = 2020;
     let pos_1 = step(pos_0);
     let pos_2 = step(pos_1);
 
-    let m = (pos_1 - pos_2) * mod_inv(pos_0 - pos_1 + deck_size, deck_size) % deck_size;
-    let b = pos_1 - (m * pos_0) % deck_size;
+    let m = (pos_1 - pos_2) * mod_inv(pos_0 - pos_1 + DECK_SIZE, DECK_SIZE) % DECK_SIZE;
+    let b = pos_1 - (m * pos_0) % DECK_SIZE;
 
-    let iterations = 101741582076661;
-    //let result = (mod_pow(m, iterations, deck_size) * pos_0) + (b * ( (mod_pow(m, iterations, deck_size) - 1) * mod_inv(m-1 + deck_size, deck_size) ) );
-    let first_term = (mod_pow(m, iterations, deck_size) * pos_0) % deck_size;
-    let geo_series = ((mod_pow(m, iterations, deck_size) - 1) * mod_inv(m - 1, deck_size)) % deck_size;
-    let result = (first_term + b * geo_series) % deck_size;
+    let _test_int: ModInteger<i128, {DECK_SIZE}> = 8.into();
 
-    println!("Day 22 part 2: {}", result % deck_size);
+    let iterations : i128 = 101741582076661;
+    //let result = (mod_pow(m, iterations, DECK_SIZE) * pos_0) + (b * ( (mod_pow(m, iterations, DECK_SIZE) - 1) * mod_inv(m-1 + DECK_SIZE, DECK_SIZE) ) );
+    let first_term = (mod_pow(m, iterations, DECK_SIZE) * pos_0) % DECK_SIZE;
+    let geo_series = ((mod_pow(m, iterations, DECK_SIZE) - 1) * mod_inv(m - 1, DECK_SIZE)) % DECK_SIZE;
+    let result = (first_term + b * geo_series) % DECK_SIZE;
+
+    //println!("Day 22 part 2: {}", result % DECK_SIZE);
+
+    let p0: ModInteger<i128, {DECK_SIZE}> = pos_0.into();
+    let p1: ModInteger<i128, {DECK_SIZE}> = pos_1.into();
+    let p2: ModInteger<i128, {DECK_SIZE}> = pos_2.into();
+    let m0: ModInteger<i128, {DECK_SIZE}> = m.into();
+    let b0: ModInteger<i128, {DECK_SIZE}> = b.into();
+
+    let ft0 = p0 * m0.pow(iterations);
+    let ge0 = (m0.pow(iterations) - 1) / (m0 - 1);
+    let re0 = ft0 + b0 * ge0;
+
+    println!("{} {}", pos_0, p0);
+    println!("{} {}", pos_1, p1);
+    println!("{} {}", pos_2, p2);
+    println!("m {} {}", m, m0);
+    println!("b {} {}", b, b0);
+    println!("FT {} {}", first_term, ft0);
+    println!("Geo {} {}", geo_series, ge0);
+    println!("Res {} {}", result, re0);
+
+    let result_modint = (m0.pow(iterations) * p0) + (b0 * ((m0.pow(iterations) - 1) / (m0 - 1)));
+    println!("Day 22 part 2: {}", result_modint);
 }
 
 fn parse_line(deck: Vec<i128>, line: &str) -> Vec<i128>
@@ -65,11 +91,10 @@ fn undo_parse_line(pos: i128, size: i128, line: &str) -> i128
     }
 }
 
-fn deal_stack(deck: Vec<i128>) -> Vec<i128>
+fn deal_stack(mut deck: Vec<i128>) -> Vec<i128>
 {
-    let mut rev_deck = deck;
-    rev_deck.reverse();
-    rev_deck
+    deck.reverse();
+    deck
 }
 
 fn undo_deal_stack(pos: i128, size: i128) -> i128

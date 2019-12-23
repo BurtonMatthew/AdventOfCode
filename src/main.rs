@@ -1,8 +1,12 @@
+#![allow(incomplete_features)]
+#![feature(const_generics)]
+
 use std::time::Instant;
 use std::fs;
 
 mod intcode;
 mod vec2;
+mod modular;
 mod day1;
 mod day2;
 mod day3;
