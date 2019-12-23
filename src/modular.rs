@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use std::convert::{From};
-use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign};
-use std::fmt::{Display};
+use std::ops::{Add, AddAssign, Sub, SubAssign, Mul, MulAssign, Div, DivAssign, Neg};
+use std::fmt::{Debug,Display};
 
 
 #[repr(transparent)]
@@ -34,6 +34,17 @@ impl<T, const MOD: i128> Add for ModInteger<T, {MOD}>
     fn add(self, other: Self) -> Self::Output 
     {
         ModInteger::modulo(self.value + other.value)
+    }
+}
+
+impl<T, const MOD: i128> Add<T> for ModInteger<T, {MOD}>
+    where T : num::Integer + Copy + std::convert::From<i128>
+{
+    type Output = Self;
+
+    fn add(self, other: T) -> Self::Output 
+    {
+        ModInteger::modulo(self.value + other)
     }
 }
 
@@ -88,6 +99,17 @@ impl<T, const MOD: i128> Mul for ModInteger<T, {MOD}>
     }
 }
 
+impl<T, const MOD: i128> Mul<T> for ModInteger<T, {MOD}>
+    where T : num::Integer + Copy + std::convert::From<i128>
+{
+    type Output = Self;
+
+    fn mul(self, other: T) -> Self::Output 
+    {
+        ModInteger::modulo(self.value * other)
+    }
+}
+
 impl<T, const MOD: i128> MulAssign for ModInteger<T, {MOD}>
     where T : num::Integer + Copy + std::convert::From<i128>
 {
@@ -108,12 +130,33 @@ impl<T, const MOD: i128> Div for ModInteger<T, {MOD}>
     }
 }
 
+impl<T, const MOD: i128> Div<T> for ModInteger<T, {MOD}>
+    where T : num::Integer + Copy + std::convert::From<i128>
+{
+    type Output = Self;
+
+    fn div(self, other: T) -> Self::Output 
+    {
+        ModInteger::modulo(self.value * mod_inv(other, MOD))
+    }
+}
+
 impl<T, const MOD: i128> DivAssign for ModInteger<T, {MOD}>
     where T : num::Integer + Copy + std::convert::From<i128>
 {
     fn div_assign(&mut self, other: Self)
     {
         *self = other / *self;
+    }
+}
+
+impl<T, const MOD: i128> Neg for ModInteger<T, {MOD}>
+    where T: num::Integer + Copy + std::convert::From<i128>
+{
+    type Output = Self;
+    fn neg(self) -> Self::Output 
+    {
+        Self { value: T::from(MOD) - self.value - T::one() }
     }
 }
 
@@ -130,6 +173,15 @@ impl<const MOD: i128> From<ModInteger<i128, {MOD}>> for i128
     fn from(item: ModInteger<i128, {MOD}>) -> Self
     {
         item.value
+    }
+}
+
+impl<T, const MOD: i128> Debug for ModInteger<T, {MOD}>
+    where T: Debug + Copy + num::Integer
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result 
+    {
+        self.value.fmt(f)
     }
 }
 
