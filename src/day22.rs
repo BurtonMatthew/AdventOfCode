@@ -97,53 +97,33 @@ fn undo_cut<const MOD:i128>(pos: ModInteger<i128,{MOD}>, cut: i128) -> ModIntege
 fn test_deal()
 {
     let deck: Vec<i128> = (0..10).collect();
-    //assert_eq!(deal_stack(deck.clone()), vec![9,8,7,6,5,4,3,2,1,0]);
-}
+    let deal_deck = |v: &Vec<i128>| v.iter().map(|i| deal_stack(ModInteger::<_,10>::from(*i)).into()).collect::<Vec<i128>>();
+    let un_deal_deck = |v: &Vec<i128>| v.iter().map(|i| undo_deal_stack(ModInteger::<_,10>::from(*i)).into()).collect::<Vec<i128>>();
 
-#[test]
-fn test_undo_deal()
-{
-    for (s,r) in [(9,0), (4,5), (0,9), (7,2)].iter()
-    {
-        let modint: ModInteger<i128,10> = ModInteger::from(*s as i128);
-        let res : i128 = undo_deal_stack(modint).into();
-        assert_eq!(res, *r as i128);
-    }
+    assert_eq!(deal_deck(&deck), vec![9,8,7,6,5,4,3,2,1,0]);
+    assert_eq!(un_deal_deck(&deal_deck(&deck)), deck);
 }
 
 #[test]
 fn test_cut()
 {
     let deck: Vec<i128> = (0..10).collect();
-    //assert_eq!(cut(deck.clone(), 3), vec![3,4,5,6,7,8,9,0,1,2]);
-    //assert_eq!(cut(deck.clone(), -4), vec![6,7,8,9,0,1,2,3,4,5]);
-}
+    let cut_deck = |v: &Vec<i128>, c| v.iter().map(|i| cut(ModInteger::<_,10>::from(*i), c).into()).collect::<Vec<i128>>();
+    let un_cut_deck = |v: &Vec<i128>, c| v.iter().map(|i| undo_cut(ModInteger::<_,10>::from(*i), c).into()).collect::<Vec<i128>>();
 
-#[test]
-fn test_undo_cut()
-{
-    for (s,c,r) in [(3,3,6), (0,3,3), (8,3,1), (3,-4,9),(0,-4,6),(8,-4,4)].iter()
-    {
-        let modint: ModInteger<i128,10> = ModInteger::from(*s as i128);
-        let res : i128 = undo_cut(modint, *c).into();
-        assert_eq!(res, *r as i128);
-    }
+    assert_eq!(cut_deck(&deck, 3),vec![7,8,9,0,1,2,3,4,5,6]);
+    assert_eq!(un_cut_deck(&cut_deck(&deck,3),3), deck);
+    assert_eq!(cut_deck(&deck, -4),vec![4,5,6,7,8,9,0,1,2,3]);
+    assert_eq!(un_cut_deck(&cut_deck(&deck,-4),-4), deck);
 }
 
 #[test]
 fn test_increment()
 {
     let deck: Vec<i128> = (0..10).collect();
-    //assert_eq!(deal_increment(deck.clone(), 3), vec![0,7,4,1,8,5,2,9,6,3]);
-}
+    let inc_deck = |v: &Vec<i128>, c| v.iter().map(|i| deal_increment(ModInteger::<_,10>::from(*i), c).into()).collect::<Vec<i128>>();
+    let un_inc_deck = |v: &Vec<i128>, c| v.iter().map(|i| undo_deal_increment(ModInteger::<_,10>::from(*i), c).into()).collect::<Vec<i128>>();
 
-#[test]
-fn test_undo_increment()
-{
-    for (s,r) in [(0,0), (1,7), (2,4), (3,1), (4,8), (5,5), (6,2), (7,9), (8,6), (9,3)].iter()
-    {
-        let modint: ModInteger<i128,10> = ModInteger::from(*s as i128);
-        let res : i128 = undo_deal_increment(modint, 3).into();
-        assert_eq!(res, *r as i128);
-    }
+    assert_eq!(inc_deck(&deck, 3), vec![0,3,6,9,2,5,8,1,4,7]);
+    assert_eq!(un_inc_deck(&inc_deck(&deck,3),3), deck);
 }
