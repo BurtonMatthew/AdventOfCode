@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 use std::ops::{Index, IndexMut};
 
+#[derive(Clone,std::cmp::PartialEq)]
 pub struct Vec2<T>
 {
     data: Vec<T>,
