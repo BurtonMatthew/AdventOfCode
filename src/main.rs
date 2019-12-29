@@ -37,7 +37,7 @@ extern crate num;
 extern crate pathfinding;
 
 fn main() 
-{
+{    
     let now = Instant::now();
     let files = (1..26).map(|i| fs::read_to_string(format!("input/day{}.txt", i)).unwrap_or_default()).collect::<Vec<String>>();
     day1::part1(files[0].trim());
@@ -72,8 +72,7 @@ fn main()
     day15::part2(&mut map);
     day16::part1(files[15].trim());
     day16::part2(files[15].trim());
-    day17::part1(files[16].trim());
-    day17::part2(files[16].trim());
+    day17::main(files[16].trim());
     day18::part1(files[17].trim());
     day18::part2(files[17].trim());
     day19::part1(files[18].trim());

@@ -76,6 +76,12 @@ impl<T> Vec2<T>
         self.data.len() / self.width
     }
 
+    pub fn get(&self, pos: (usize, usize)) -> Option<&T>
+    {
+        if pos.0 < self.width && pos.1 < self.height() { Some(&self[pos]) }
+        else { None }
+    }
+
     pub fn push_row(&mut self, row: Vec<T>) 
     {
         if self.width > 0 
@@ -95,10 +101,15 @@ impl<T> Vec2<T>
     }
 
     // Easier Impl
-    //pub fn row(&self) -> std::slice::Chunks<T>
+    //pub fn rows(&self) -> std::slice::Chunks<T>
     //{
     //    self.data.chunks(self.width())
     //}
+
+    pub fn iter(&self) -> std::slice::Iter<'_, T>
+    {
+        self.data.iter()
+    }
 }
 
 pub struct RowIter<'a, T:'a>
