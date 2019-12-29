@@ -47,8 +47,7 @@ pub fn part(file_data: &str)
                         .collect::<String>()
                         .split_whitespace()
                         .map(|word| word.parse::<i64>())
-                        .filter_map(|x| x.ok())
-                        .next()
+                        .find_map(|x| x.ok())
                         .unwrap();
 
     println!("Day 25: {}", result);
