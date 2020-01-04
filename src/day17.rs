@@ -115,18 +115,10 @@ pub fn part2(file_data: &str, map: &Vec2<char>)
         .map(|p| path_to_string(p))
         .join("\n") + "\nn\n";
 
-    let mut prog_data : Vec<i64> = file_data.split(",")
-                                .map(|num| num.parse::<i64>())
-                                .filter(|num| num.is_ok())
-                                .map(|num| num.unwrap())
-                                .collect();
-    prog_data.reserve(2000);
-    for _ in 0..2000
-    {
-        prog_data.push(0);
-    }
-    prog_data[0] = 2;
-    let mut program = Program::from_tape(prog_data);
+    let mut program: Program = file_data.parse().unwrap();
+    program.extend_tape(2000);
+    program[0] = 2;
+    
     prog_input.chars().for_each(|c| program.push_input(c as i64));
 
     println!("Day 17 part 2: {}", program.last().unwrap());

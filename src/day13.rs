@@ -25,21 +25,9 @@ pub fn part1(file_data: &str)
 
 pub fn part2(file_data: &str)
 {
-    let mut prog_data : Vec<i64> = file_data.split(",")
-        .map(|num| num.parse::<i64>())
-        .filter(|num| num.is_ok())
-        .map(|num| num.unwrap())
-        .collect();
-
-    prog_data.reserve(1000);
-    for _ in 0..1000
-    {
-        prog_data.push(0);
-    }
-
-    prog_data[0] = 2;
-
-    let mut breakout = Program::from_tape(prog_data);
+    let mut breakout : Program = file_data.parse().unwrap();
+    breakout.extend_tape(1000);
+    breakout[0] = 2;
 
     let mut ball_x = 0;
     let mut paddle_x = 0;

@@ -125,10 +125,23 @@ impl Program
     { 
         self.awaiting_input 
     }
+}
 
-    pub fn read_at(&self, index: usize) -> i64
+impl std::ops::Index<usize> for Program
+{
+    type Output = i64;
+
+    fn index(&self, index: usize) -> &Self::Output
     {
-        self.tape[index]
+        &self.tape[index]
+    }
+}
+
+impl std::ops::IndexMut<usize> for Program
+{
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output
+    {
+        &mut self.tape[index]
     }
 }
 
