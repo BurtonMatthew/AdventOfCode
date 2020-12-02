@@ -19,7 +19,7 @@ pub fn parse_input(buf : &str) -> Vec<Password>
         let character: char;
         let password: String;
         scan!(line.bytes() => "{}-{} {}: {}", min, max, character, password);
-        result.push(Password{min, max, character: character, password});
+        result.push(Password{min, max, character, password});
     }
 
     result
