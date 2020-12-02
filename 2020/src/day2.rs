@@ -30,7 +30,7 @@ pub fn part1(input : &[Password]) -> usize
 {
     input.iter().filter(|pass|
         { 
-            let instances = pass.password.matches(pass.character).count(); 
+            let instances = pass.password.chars().filter(|c| *c == pass.character).count(); 
             instances >= pass.min && instances <= pass.max
         }).count()
 }
