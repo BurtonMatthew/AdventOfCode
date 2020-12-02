@@ -42,7 +42,7 @@ pub fn part2(input : &[Password]) -> usize
         {
             let match_min = pass.password.as_bytes()[pass.min-1] as char == pass.character;
             let match_max = pass.password.as_bytes()[pass.max-1] as char == pass.character;
-            (match_min || match_max) && (match_min != match_max)
+            match_min ^ match_max
         }).count()
 }
 
