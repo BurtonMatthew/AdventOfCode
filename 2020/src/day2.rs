@@ -11,18 +11,15 @@ pub struct Password
 #[aoc_generator(day2)]
 pub fn parse_input(buf : &str) -> Vec<Password>
 {
-    let mut result = Vec::new();
-    for line in buf.lines()
+    buf.lines().map(|line|
     {
         let min : usize;
         let max : usize;
         let character: char;
         let password: String;
         scan!(line.bytes() => "{}-{} {}: {}", min, max, character, password);
-        result.push(Password{min, max, character, password});
-    }
-
-    result
+        Password{min, max, character, password}
+    }).collect()
 }
 
 #[aoc(day2, part1)]
