@@ -64,7 +64,7 @@ mod tests
     }
 
     #[test]
-    pub fn test2() 
+    pub fn part2_test() 
     {
         assert_eq!(part2(&parse_input(TEST_DATA)), 1)
     }

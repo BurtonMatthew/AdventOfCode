@@ -55,7 +55,7 @@ mod tests
     }
 
     #[test]
-    pub fn test2() 
+    pub fn part2_test() 
     {
         assert_eq!(part2(&TEST_DATA), 979 * 366 * 675)
     }
