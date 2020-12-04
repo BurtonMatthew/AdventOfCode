@@ -12,7 +12,9 @@ pub fn parse_input(buf :&str) -> Vec<String>
 #[aoc(day4, part1)]
 pub fn part1<'a>(input : &Vec<String>) -> usize
 {
-    input.iter().filter(|entry| ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"].iter().fold(true, |acc, tag| acc & entry.contains(tag))).count()
+    input.iter().filter(|entry| ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"].iter()
+                                .fold(true, |acc, tag| acc & entry.contains(tag))
+                       ).count()
 }
 
 #[aoc(day4, part2, parser_combinator)]
@@ -59,7 +61,8 @@ pub fn part2_dict(input : &Vec<String>) -> usize
         if hair_color.chars().count() != 7 { continue; }
         if hair_color.chars().filter(|c| c.is_digit(16)).count() != 6 { continue; }
 
-        if !["amb".to_string(), "blu".to_string(), "brn".to_string(), "gry".to_string(), "grn".to_string(), "hzl".to_string(), "oth".to_string()].contains(pass.get("ecl").unwrap()) { continue; }
+        let eye_color = pass.get("ecl").unwrap();
+        if !["amb", "blu", "brn", "gry", "grn", "hzl", "oth"].contains(&eye_color.as_str()) { continue; }
 
         let id = pass.get("pid").unwrap();
         if id.chars().count() != 9 { continue; }
@@ -215,10 +218,7 @@ fn is_hex_digit(c: char) -> bool
 
 fn parse_hex_color_channel(i: &str) -> nom::IResult<&str, u8>
 {
-    map_res(
-        take_while_m_n(2, 2, is_hex_digit),
-        |c| u8::from_str_radix(c, 16)
-      )(i)
+    map_res(take_while_m_n(2, 2, is_hex_digit), |c| u8::from_str_radix(c, 16))(i)
 }
 
 fn parse_hex_color(i: &str) -> nom::IResult<&str, Color>
