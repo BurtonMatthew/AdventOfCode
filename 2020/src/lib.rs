@@ -4,6 +4,7 @@ extern crate aoc_runner_derive;
 
 extern crate itertools;
 extern crate text_io;
+extern crate nom;
 
 pub mod vec2;
 
