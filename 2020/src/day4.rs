@@ -235,20 +235,20 @@ fn parse_hex_color(i: &str) -> nom::IResult<&str, Color>
 
 fn parse_birth_year(i: &str) -> nom::IResult<&str, PassportElement>
 {
-    let (i,yr) =  preceded(tag("byr:"), parse_int_between(1920, 2002))(i)?;
-    Ok((i, PassportElement::BirthYear(yr)))
+    preceded(tag("byr:"), parse_int_between(1920, 2002))(i)
+        .map(|(i,yr)| (i, PassportElement::BirthYear(yr)))
 }
 
 fn parse_issue_year(i: &str) -> nom::IResult<&str, PassportElement>
 {
-    let (i,yr) = preceded(tag("iyr:"), parse_int_between(2010, 2020))(i)?;
-    Ok((i, PassportElement::IssueYear(yr)))
+    preceded(tag("iyr:"), parse_int_between(2010, 2020))(i)
+        .map(|(i,yr)| (i, PassportElement::IssueYear(yr)))
 }
 
 fn parse_expiration_year(i: &str) -> nom::IResult<&str, PassportElement>
 {
-    let (i,yr) = preceded(tag("eyr:"), parse_int_between(2020, 2030))(i)?;
-    Ok((i, PassportElement::ExpirationYear(yr)))
+    preceded(tag("eyr:"), parse_int_between(2020, 2030))(i)
+        .map(|(i,yr)| (i, PassportElement::ExpirationYear(yr)))
 }
 
 fn parse_height(i: &str) -> nom::IResult<&str, PassportElement>
@@ -270,26 +270,26 @@ fn parse_height(i: &str) -> nom::IResult<&str, PassportElement>
 
 fn parse_hair_color(i: &str) -> nom::IResult<&str, PassportElement>
 {
-    let (i,clr) = preceded(tag("hcl:"), parse_hex_color)(i)?;
-    Ok((i, PassportElement::HairColor(clr)))
+    preceded(tag("hcl:"), parse_hex_color)(i)
+        .map(|(i,clr)| (i, PassportElement::HairColor(clr)))
 }
 
 fn parse_eye_color(i: &str) -> nom::IResult<&str, PassportElement>
 {
-    let (i,clr) = preceded(tag("ecl:"), map_res(take(3usize), str::parse))(i)?;
-    Ok((i, PassportElement::EyeColor(clr)))
+    preceded(tag("ecl:"), map_res(take(3usize), str::parse))(i)
+        .map(|(i,clr)| (i, PassportElement::EyeColor(clr)))
 }
 
 fn parse_passport_id(i: &str) -> nom::IResult<&str, PassportElement>
 {
-    let (i, id) = preceded(tag("pid:"), take_while_m_n(9,9, char::is_numeric))(i)?;
-    Ok((i, PassportElement::Id(id.to_string())))
+    preceded(tag("pid:"), take_while_m_n(9,9, char::is_numeric))(i)
+        .map(|(i,id)| (i, PassportElement::Id(id.to_string())))
 }
 
 fn parse_country_id(i: &str) -> nom::IResult<&str, PassportElement>
 {
-    let (i, id) = preceded(tag("cid:"), map_res(take_while1(char::is_numeric), str::parse))(i)?;
-    Ok((i, PassportElement::CountryId(id)))
+    preceded(tag("cid:"), map_res(take_while1(char::is_numeric), str::parse))(i)
+        .map(|(i,id)| (i, PassportElement::CountryId(id)))
 }
 
 fn parse_passport_element(i: &str) -> nom::IResult<&str, PassportElement>
