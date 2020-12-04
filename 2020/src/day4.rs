@@ -1,13 +1,22 @@
-use vec2::Vec2;
 use std::collections::HashMap;
 
-
 #[aoc_generator(day4)]
-pub fn parse_input(buf : &str) -> Vec<HashMap<String, String>>
+pub fn parse_input(buf :&str) -> Vec<String>
 {
+    buf.split("\n\n").map(|s| s.to_string()).collect()
+}
 
+#[aoc(day4, part1)]
+pub fn part1<'a>(input : &Vec<String>) -> usize
+{
+    input.iter().filter(|entry| ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"].iter().fold(true, |acc, tag| acc & entry.contains(tag))).count()
+}
+
+#[aoc(day4, part2)]
+pub fn part2(input : &Vec<String>) -> usize
+{
     let mut res = Vec::new();
-    for entry in buf.split("\n\n")
+    for entry in input
     {
         let mut passport = HashMap::new();
         for token in entry.split(char::is_whitespace)
@@ -17,29 +26,8 @@ pub fn parse_input(buf : &str) -> Vec<HashMap<String, String>>
         }
         res.push(passport);
     }
-    res
-}
 
-#[aoc(day4, part1)]
-pub fn part1(input : &Vec<HashMap<String, String>>) -> usize
-{
-    input.iter().filter(|pass| 
-        {
-            pass.contains_key("byr") &&
-            pass.contains_key("iyr") &&
-            pass.contains_key("eyr") &&
-            pass.contains_key("hgt") &&
-            pass.contains_key("hcl") &&
-            pass.contains_key("ecl") &&
-            pass.contains_key("pid")
-        }
-        ).count()
-}
-
-#[aoc(day4, part2)]
-pub fn part2(input : &Vec<HashMap<String, String>>) -> usize
-{
-    input.iter().filter(|pass| 
+    res.iter().filter(|pass| 
     {
         pass.contains_key("byr") && pass.get("byr").unwrap().parse::<i32>().unwrap() >= 1920 && pass.get("byr").unwrap().parse::<i32>().unwrap() <= 2002 &&
         pass.contains_key("iyr") && pass.get("iyr").unwrap().parse::<i32>().unwrap() >= 2010 && pass.get("iyr").unwrap().parse::<i32>().unwrap() <= 2020 &&
@@ -60,7 +48,7 @@ mod tests
 {
     use super::*;
 
-    const TEST_DATA: &str = 
+    const TEST_DATA_1: &str = 
 "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
 byr:1937 iyr:2017 cid:147 hgt:183cm
 
@@ -75,9 +63,43 @@ hgt:179cm
 hcl:#cfa07d eyr:2025 pid:166559648
 iyr:2011 ecl:brn hgt:59in";
 
+    const TEST_DATA_2: &str =
+"eyr:1972 cid:100
+hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
+
+iyr:2019
+hcl:#602927 eyr:1967 hgt:170cm
+ecl:grn pid:012533040 byr:1946
+
+hcl:dab227 iyr:2012
+ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277
+
+hgt:59cm ecl:zzz
+eyr:2038 hcl:74454a iyr:2023
+pid:3556412378 byr:2007
+
+pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
+hcl:#623a2f
+
+eyr:2029 ecl:blu cid:129 byr:1989
+iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
+
+hcl:#888785
+hgt:164cm byr:2001 iyr:2015 cid:88
+pid:545766238 ecl:hzl
+eyr:2022
+
+iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
+
     #[test]
     pub fn part1_test() 
     {
-        assert_eq!(part1(&parse_input(TEST_DATA)), 2)
+        assert_eq!(part1(&parse_input(TEST_DATA_1)), 2)
+    }
+
+    #[test]
+    pub fn part2_test() 
+    {
+        assert_eq!(part2(&parse_input(TEST_DATA_2)), 4)
     }
 }
