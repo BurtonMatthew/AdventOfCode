@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 #[aoc_generator(day5)]
 pub fn parse_input(buf :&str) -> Vec<usize>
 {
@@ -15,7 +17,7 @@ pub fn parse_input(buf :&str) -> Vec<usize>
                 ).collect();
     
             usize::from_str_radix(&bin_str[0..7], 2).unwrap() * 8 + usize::from_str_radix(&bin_str[7..10], 2).unwrap()
-        }).collect()
+        }).sorted().collect()
 }
 
 #[aoc(day5, part1)]
@@ -28,6 +30,16 @@ pub fn part1(input : &[usize]) -> usize
 pub fn part2(input : &[usize]) -> usize
 {
     (1..(128*8)).filter(|id| !input.contains(&id) && input.contains(&(id-1)) && input.contains(&(id+1))).next().unwrap()
+}
+
+#[aoc(day5, part2, part2_single_pass)]
+pub fn part2_single_pass(input : &[usize]) -> usize
+{
+    for i in 0..input.len()
+    {
+        if input[i]+1 != input[i+1] { return input[i]+1; }
+    }
+    unreachable!()
 }
 
 #[cfg(test)]
