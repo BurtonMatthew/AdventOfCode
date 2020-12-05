@@ -1,47 +1,33 @@
-#[aoc(day5, part1)]
-pub fn part1(input : &str) -> usize
+#[aoc_generator(day5)]
+pub fn parse_input(buf :&str) -> Vec<usize>
 {
-    input.lines().map(|line|
-    {
-        let bin_str : String = line.chars().map(|c| 
-            match c
-            {
-                'F' => '0',
-                'B' => '1',
-                'L' => '0',
-                'R' => '1',
-                _ => unreachable!()
-            }
-            ).collect();
+    buf.lines().map(|line|
+        {
+            let bin_str : String = line.chars().map(|c| 
+                match c
+                {
+                    'F' => '0',
+                    'B' => '1',
+                    'L' => '0',
+                    'R' => '1',
+                    _ => unreachable!()
+                }
+                ).collect();
+    
+            usize::from_str_radix(&bin_str[0..7], 2).unwrap() * 8 + usize::from_str_radix(&bin_str[7..10], 2).unwrap()
+        }).collect()
+}
 
-        usize::from_str_radix(&bin_str[0..7], 2).unwrap() * 8 + usize::from_str_radix(&bin_str[7..10], 2).unwrap()
-    }).max().unwrap()
+#[aoc(day5, part1)]
+pub fn part1(input : &[usize]) -> usize
+{
+    *input.iter().max().unwrap()
 }
 
 #[aoc(day5, part2)]
-pub fn part2(input :  &str) -> usize
+pub fn part2(input : &[usize]) -> usize
 {
-    let seats: Vec<usize> = input.lines().map(|line|
-    {
-    let bin_str : String = line.chars().map(|c| 
-        match c
-        {
-            'F' => '0',
-            'B' => '1',
-            'L' => '0',
-            'R' => '1',
-            _ => unreachable!()
-        }
-        ).collect();
-
-        usize::from_str_radix(&bin_str[0..7], 2).unwrap() * 8 + usize::from_str_radix(&bin_str[7..10], 2).unwrap()
-    }).collect();
-
-    for id in 1..(128*8)
-    {
-        if !seats.contains(&id) && seats.contains(&(id-1)) && seats.contains(&(id+1)) { return id }
-    }
-    unreachable!()
+    (1..(128*8)).filter(|id| !input.contains(&id) && input.contains(&(id-1)) && input.contains(&(id+1))).next().unwrap()
 }
 
 #[cfg(test)]
@@ -50,11 +36,20 @@ mod tests
     use super::*;
 
     const TEST_DATA: &str = 
-"FBFBBFFRLR";
+"FBFBBFFRLR
+BFFFBBFRRR
+FFFBBBFRRR
+BBFFBBFRLL";
+
+    #[test]
+    pub fn parse_test() 
+    {
+        assert_eq!(parse_input(TEST_DATA), vec!(357, 567, 119, 820));
+    }
 
     #[test]
     pub fn part1_test() 
     {
-        assert_eq!(part1(TEST_DATA), 357);
+        assert_eq!(part1(&parse_input(TEST_DATA)), 820);
     }
 }
