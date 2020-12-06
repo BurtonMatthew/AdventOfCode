@@ -56,7 +56,7 @@ BBFFBBFRLL";
     #[test]
     pub fn parse_test() 
     {
-        assert_eq!(parse_input(TEST_DATA), vec!(357, 567, 119, 820));
+        assert_eq!(parse_input(TEST_DATA), vec!(119, 357, 567, 820));
     }
 
     #[test]
