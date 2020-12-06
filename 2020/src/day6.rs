@@ -11,9 +11,9 @@ pub fn parse_input(buf :&str) -> Vec<String>
 pub fn part1(input : &Vec<String>) -> usize
 {
     input.iter().map(|s| 
-        {
-            s.chars().filter(|c| !c.is_whitespace()).unique().count()
-        }).sum()
+    {
+        s.chars().filter(|c| !c.is_whitespace()).unique().count()
+    }).sum()
 }
 
 #[aoc(day6, part2)]
@@ -43,10 +43,9 @@ pub fn part2_hashset(input : &Vec<String>) -> usize
 {
     input.iter().map(|s| 
     {
-        let mut set_iter = s.lines().map(|l| l.chars().collect::<HashSet<char>>());
-
-        set_iter.next()
-            .map(|set| set_iter.fold(set, |set1, set2| set1.intersection(&set2).cloned().collect()))
+        s.lines()
+            .map(|l| l.chars().collect::<HashSet<_>>())
+            .fold1(|set1, set2| &set1 & &set2)
             .unwrap()
             .len()
     }).sum()
