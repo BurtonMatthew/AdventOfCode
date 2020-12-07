@@ -60,7 +60,7 @@ pub fn part1(input : &InputType) -> usize
 #[aoc(day7, part2)]
 pub fn part2(input : &InputType) -> u32
 {
-    get_contained_bags(&"shiny gold bag".to_string(), &mut HashMap::new(), input)
+    get_contained_bags(&"shiny gold bag".to_string(), &mut HashMap::with_capacity(input.len()), input)
 }
 
 pub fn get_contained_bags(root_bag: &String, cache: &mut HashMap<String, u32>, input : &InputType) -> u32
