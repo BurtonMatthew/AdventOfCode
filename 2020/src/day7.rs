@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::str::FromStr;
+use fn_memo::{FnMemo, unsync::memoize, recur_fn::recur_fn};
 
 type InputType = HashMap<String, Vec<(String,u32)>>;
 #[aoc_generator(day7)]
@@ -87,6 +88,17 @@ pub fn get_contained_bags(root_bag: &String, cache: &mut HashMap<String, u32>, i
     {
         0
     }
+}
+
+#[aoc(day7, part2, part2_recursive_memo)]
+pub fn part2_recursive_memo(input : &InputType) -> u32
+{
+    let get_contained_bags = memoize(recur_fn(|get_contained_bags, root_bag: &String| {
+        input.get(root_bag)
+            .map(|contained_bags| contained_bags.iter().fold(0, |total, (bag, num)| total + num * (get_contained_bags(bag) + 1)))
+            .unwrap_or(0)
+    }));
+    get_contained_bags.call(&"shiny gold bag".to_string())
 }
 
 #[cfg(test)]

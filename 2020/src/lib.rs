@@ -2,9 +2,10 @@ extern crate aoc_runner;
 #[macro_use]
 extern crate aoc_runner_derive;
 
+extern crate fn_memo;
 extern crate itertools;
-extern crate text_io;
 extern crate nom;
+extern crate text_io;
 
 pub mod vec2;
 
