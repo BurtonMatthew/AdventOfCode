@@ -51,9 +51,9 @@ pub fn part1(input : &InputType) -> i32
 #[aoc(day8, part2)]
 pub fn part2(input : &InputType) -> i32
 {
+    let mut new_prog = input.clone();
     for i in 0..input.len()
     {
-        let mut new_prog = input.clone();
         if let Ops::Nop(x) = input[i]
         {
             new_prog[i] = Ops::Jmp(x);
@@ -61,6 +61,7 @@ pub fn part2(input : &InputType) -> i32
             {
                 return r;
             }
+            new_prog[i] = Ops::Nop(x);
         }
         else if let Ops::Jmp(x) = input[i]
         {
@@ -69,6 +70,7 @@ pub fn part2(input : &InputType) -> i32
             {
                 return r;
             }
+            new_prog[i] = Ops::Jmp(x);
         }
     }
     unreachable!()
@@ -93,6 +95,67 @@ pub fn part2_prog(input : &InputType) -> Option<i32>
     }
 
     None
+}
+
+
+#[aoc(day8, part2, part2_rollback)]
+pub fn part2_rollback(input : &InputType) -> i32
+{
+    struct State
+    {
+        i: usize,
+        acc: i32,
+        visited: HashSet<usize>
+    }
+    let mut visited: HashSet<usize> = HashSet::new();
+    let mut states: Vec<State> = Vec::new();
+    let mut i = 0;
+    let mut acc = 0;
+    
+    // Run unmodified program until we hit loop, save full machine state at every nop/jmp
+    while !visited.contains(&i)
+    {
+        visited.insert(i);
+        match &input[i]
+        {
+            Ops::Nop(_) => { states.push(State{i,acc,visited: visited.clone()}); i += 1;},
+            Ops::Acc(x) => { acc += x; i +=1; },
+            Ops::Jmp(x) => { states.push(State{i,acc,visited: visited.clone()}); i = (i as i32 + x) as usize; }
+        }
+    }
+
+    // All nops/jumps prior to the loops are candidates to be swapped. Work backwards from the ones we encountered
+    // since they're the quickest to terminate
+    while let Some(state) = states.pop()
+    {
+        i = state.i;
+        acc = state.acc;
+        // Swap jmp and nop for first instruction
+        match &input[i]
+        {
+            Ops::Jmp(_) => { i += 1;},
+            Ops::Acc(x) => { acc += x; i +=1; },
+            Ops::Nop(x) => { i = (i as i32 + x) as usize; }
+        }
+        visited = state.visited;
+
+        // Run the machine until we hit the loop or an exit successfully
+        while !visited.contains(&i) && i < input.len()
+        {
+            visited.insert(i);
+            match &input[i]
+            {
+                Ops::Nop(_) => { i += 1;},
+                Ops::Acc(x) => { acc += x; i +=1; },
+                Ops::Jmp(x) => { i = (i as i32 + x) as usize; }
+            }
+        }
+
+        // If successful, return the result
+        if i >= input.len() { return acc; }
+    }
+
+    unreachable!()
 }
 
 #[cfg(test)]
