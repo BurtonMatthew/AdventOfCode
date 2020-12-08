@@ -128,8 +128,11 @@ pub fn part2_rollback(input : &InputType) -> i32
     // since they're the quickest to terminate
     while let Some(state) = states.pop()
     {
+        // Restore state
         i = state.i;
         acc = state.acc;
+        visited = state.visited;
+
         // Swap jmp and nop for first instruction
         match &input[i]
         {
@@ -137,7 +140,6 @@ pub fn part2_rollback(input : &InputType) -> i32
             Ops::Acc(x) => { acc += x; i +=1; },
             Ops::Nop(x) => { i = (i as i32 + x) as usize; }
         }
-        visited = state.visited;
 
         // Run the machine until we hit the loop or an exit successfully
         while !visited.contains(&i) && i < input.len()
