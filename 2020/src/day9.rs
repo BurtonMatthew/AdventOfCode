@@ -79,6 +79,43 @@ pub fn p2(input : &InputType, w:usize) -> u64
     unreachable!()
 }
 
+// Credit to Marcela
+#[aoc(day9, part2, part2_sliding_window)]
+pub fn part2_sliding_window(input : &InputType) -> u64
+{
+    p2_sliding(input, 25)
+}
+
+pub fn p2_sliding(input : &InputType, w:usize) -> u64
+{
+    let p1 = p1(&input,w);
+
+    let mut start_i = 0;
+    let mut running_total = 0;
+    for i in 0..input.len()
+    {
+        let num = input[i];
+        while running_total > p1
+        {
+            running_total -= input[start_i];
+            start_i += 1;
+        }
+
+        if running_total != p1
+        {
+            running_total += num
+        }
+        else
+        {
+            if let MinMax(&min,&max) = &input[start_i..i].iter().minmax()
+            {
+                return min + max;
+            }
+        }
+    }
+    unreachable!()
+}
+
 #[cfg(test)]
 mod tests 
 {
