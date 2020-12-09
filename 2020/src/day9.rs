@@ -19,19 +19,15 @@ pub fn part1(input : &InputType) -> u64
 
 pub fn p1(input : &InputType, w:usize) -> u64
 {
-    let mut vector: VecDeque<u64> = VecDeque::with_capacity(w);
     let mut sums: VecDeque<u64> =  VecDeque::with_capacity(w*w);
-    for i in 0..w
-    {
-        vector.push_back(input[i]);
-    }
+
     for i in 0..w
     {
         for j in 0..w
         {
             if i != j
             {
-                sums.push_back(vector[i] + vector[j]);
+                sums.push_back(input[i] + input[j]);
             }
         }
     }
@@ -41,10 +37,8 @@ pub fn p1(input : &InputType, w:usize) -> u64
         let v = input[i];
         if sums.contains(&v)
         {
-            vector.pop_front();
-            for _ in 0..w-1 { sums.pop_front(); }
-            sums.extend(vector.iter().map(|x| x+v));
-            vector.push_back(v);
+            drop(sums.drain(0..w-1));
+            sums.extend(input[i-w+1..i].iter().map(|x| x+v));
         }
         else
         {
