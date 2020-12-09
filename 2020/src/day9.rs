@@ -58,15 +58,18 @@ pub fn p2(input : &InputType, w:usize) -> u64
 {
     let p1 = p1(&input,w);
 
-    for i in 0..input.len()
+    for run_length in 2..input.len()
     {
-        let mut sum = 0;
-        for j in i..input.len()
+        let mut running_total: u64 = input[0..run_length].iter().sum();
+        for i in run_length..input.len()
         {
-            sum += input[j];
-            if sum == p1 && j != i
+            if running_total != p1
             {
-                if let MinMax(&min,&max) = &input[i..j].iter().minmax()
+                running_total = running_total + input[i] - input[i-run_length];
+            }
+            else
+            {
+                if let MinMax(&min,&max) = &input[i-run_length..i].iter().minmax()
                 {
                     return min + max;
                 }
