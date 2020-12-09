@@ -1,4 +1,6 @@
 use std::collections::VecDeque;
+use itertools::Itertools;
+use itertools::MinMaxResult::MinMax;
 
 // Simple lines
 type InputType = Vec<u64>;
@@ -18,29 +20,33 @@ pub fn part1(input : &InputType) -> u64
 pub fn p1(input : &InputType, w:usize) -> u64
 {
     let mut vector: VecDeque<u64> = VecDeque::with_capacity(w);
+    let mut sums: VecDeque<u64> =  VecDeque::with_capacity(w*w);
     for i in 0..w
     {
         vector.push_back(input[i]);
+    }
+    for i in 0..w
+    {
+        for j in 0..w
+        {
+            if i != j
+            {
+                sums.push_back(vector[i] + vector[j]);
+            }
+        }
     }
 
     for i in w..input.len()
     {
         let v = input[i];
-        let mut found = false;
-        for j in 0..w
+        if sums.contains(&v)
         {
-            for k in 0..w
-            {
-                if !found && j != k && v == (vector[j] + vector[k])
-                {
-                    vector.pop_front();
-                    vector.push_back(v);
-                    found = true;
-                }
-            }
+            vector.pop_front();
+            for _ in 0..w-1 { sums.pop_front(); }
+            sums.extend(vector.iter().map(|x| x+v));
+            vector.push_back(v);
         }
-
-        if !found
+        else
         {
             return v;
         }
@@ -51,22 +57,25 @@ pub fn p1(input : &InputType, w:usize) -> u64
 #[aoc(day9, part2)]
 pub fn part2(input : &InputType) -> u64
 {
-    let p1 = part1(&input);
+    p2(input, 25)
+}
+
+pub fn p2(input : &InputType, w:usize) -> u64
+{
+    let p1 = p1(&input,w);
+
     for i in 0..input.len()
     {
         let mut sum = 0;
-        let mut min = u64::MAX;
-        let mut max = u64::MIN;
-
         for j in i..input.len()
         {
-            if input[j] < min { min = input[j];}
-            if input[j] > max { max = input[j];}
-
             sum += input[j];
             if sum == p1 && j != i
             {
-                return min + max;
+                if let MinMax(&min,&max) = &input[i..j].iter().minmax()
+                {
+                    return min + max;
+                }
             }
         }
     }
@@ -109,6 +118,6 @@ mod tests
     #[test]
     pub fn part2_test() 
     {
-        assert_eq!(part2(&parse_input(TEST_DATA)), 62)
+        assert_eq!(p2(&parse_input(TEST_DATA), 5), 62)
     }
 }
