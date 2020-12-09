@@ -1,11 +1,11 @@
 // Set of commonly used generators to copy/paste from
 
 // Simple lines
-type Input_Type = Vec<String>;
+type InputType = Vec<String>;
 #[aoc_generator(dayX)]
-pub fn parse_input(buf :&str) -> Input_Type
+pub fn parse_input(buf :&str) -> InputType
 {
-    buf.split("\n\n").map(|s| s.to_string()).collect()
+    buf.lines().collect()
 }
 
 // Parsed lines
@@ -14,9 +14,9 @@ struct InData
     field: u32
 }
 
-type Input_Type = Vec<InData>;
+type InputType = Vec<InData>;
 #[aoc_generator(dayX)]
-pub fn parse_input(buf :&str) -> Input_Type
+pub fn parse_input(buf :&str) -> InputType
 {
     buf.lines().map(|line|
         {
@@ -27,16 +27,16 @@ pub fn parse_input(buf :&str) -> Input_Type
 }
 
 // Multi-line chunks separated by double newlines
-type Input_Type = Vec<String>;
+type InputType = Vec<String>;
 #[aoc_generator(dayX)]
-pub fn parse_input(buf :&str) -> Input_Type
+pub fn parse_input(buf :&str) -> InputType
 {
     buf.split("\n\n").map(|s| s.to_string()).collect()
 }
 
 // 2D character grid
-type Input_Type = Vec2<char>;
-pub fn parse_input(buf : &str) -> Input_Type
+type InputType = Vec2<char>;
+pub fn parse_input(buf : &str) -> InputType
 {
     buf.parse().unwrap()
 }
