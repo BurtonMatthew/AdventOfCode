@@ -1,17 +1,19 @@
+use std::str::FromStr;
+use std::collections::HashSet;
+use std::collections::VecDeque;
 use itertools::Itertools;
 use text_io::scan;
 use vec2::Vec2;
 
 
-
 #[aoc(dayX, part1)]
-pub fn part1(input : &Input_Type) -> usize
+pub fn part1(input : &InputType) -> usize
 {
     0
 }
 
 #[aoc(dayX, part2)]
-pub fn part2(input : &Input_Type) -> usize
+pub fn part2(input : &InputType) -> usize
 {
     0
 }
