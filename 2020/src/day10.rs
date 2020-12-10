@@ -5,7 +5,7 @@ type InputType = Vec<usize>;
 pub fn parse_input(buf :&str) -> InputType
 {
     let mut v = vec![0;1];
-    v.extend(buf.lines().map(|l| l.parse().unwrap()).sorted().collect::<InputType>());
+    v.extend(buf.lines().map(|l| l.parse::<usize>().unwrap()).sorted());
     v
 }
 
@@ -24,14 +24,14 @@ pub fn part1(input : &InputType) -> usize
 #[aoc(day10, part2)]
 pub fn part2(input : &InputType) -> usize
 {
-    let mut combinations = vec![0; input.last().unwrap()+4];
-    combinations[input.last().unwrap()+3] = 1;
-    for &x in input.iter().rev()
+    let mut paths_to_output = vec![0; input.last().unwrap()+3];
+    paths_to_output[*input.last().unwrap()] = 1;
+    for &x in input.iter().rev().skip(1)
     {
-        combinations[x] = combinations[x+1] + combinations[x+2] + combinations[x+3];
+        paths_to_output[x] = paths_to_output[x+1] + paths_to_output[x+2] + paths_to_output[x+3];
     }
 
-    combinations[0]
+    paths_to_output[0]
 }
 
 #[cfg(test)]
