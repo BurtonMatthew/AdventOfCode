@@ -13,15 +13,12 @@ pub fn parse_input(buf :&str) -> InputType
 #[aoc(day10, part1)]
 pub fn part1(input : &InputType) -> usize
 {
-    let mut gap1 = 0;
-    let mut gap3 = 0;
+    let mut gaps = [0;4];
     for i in 0..input.len()-1
     {
-        if input[i+1] - input[i] == 1 { gap1 += 1; }
-        if input[i+1] - input[i] == 3 { gap3 += 1; }
+        gaps[input[i+1] - input[i]] += 1;
     }
-
-    gap1 * (gap3+1)
+    gaps[1] * (gaps[3]+1)
 }
 
 #[aoc(day10, part2)]
