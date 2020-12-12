@@ -1,165 +1,110 @@
-use vec2::Vec2;
-use std::mem::swap;
+use packed_simd::u8x64;
 
-// 2D character grid
-type InputType = Vec2<char>;
-#[aoc_generator(day11)]
-pub fn parse_input(buf : &str) -> InputType
+const PADDING: usize = 1;
+const SIMD_WIDTH: usize = 64;
+
+pub struct StateData
 {
-    buf.parse().unwrap()
+    seats: Vec<u8>,
+    width: usize,
+    height: usize,
+    padded_width: usize,
+}
+
+#[aoc_generator(day11)]
+pub fn parse_input(buf :&str) -> StateData
+{
+    let width = buf.find('\n').unwrap();
+    let height = buf.lines().count();
+    let padded_width = ((width + SIMD_WIDTH -1) / SIMD_WIDTH) * SIMD_WIDTH + PADDING + PADDING;
+    let padded_height = height + PADDING + PADDING;
+    let vec_len = padded_width * padded_height;
+
+    let mut seats = Vec::with_capacity(vec_len);
+
+    for _ in 0..padded_width*PADDING
+    {
+        seats.push(0);
+    }
+
+    let mut i = 0;
+    let mut bytes = buf.bytes().filter(|&c| c != b'\n');
+    for _ in 0..height
+    {
+        for _ in 0..PADDING
+        {
+            seats.push(0);
+        }
+        for _ in 0..width
+        {
+            if bytes.next().unwrap() == b'L' { seats.push(1); } else { seats.push(0); }
+        }
+        for _ in 0..padded_width-width-PADDING
+        {
+            seats.push(0);
+        }
+    }
+
+    for _ in 0..padded_width*PADDING
+    {
+        seats.push(0);
+    }
+
+    StateData{seats, width, height, padded_width}
 }
 
 #[aoc(day11, part1)]
-pub fn part1(input : &InputType) -> usize
+pub fn part1(input : &StateData) -> usize
 {
-    let mut prev = input.clone();
-    let mut next = input.clone();
+    let mut occupied = vec![0; input.seats.len()];
+    let mut neighbor_counts = vec![0; input.seats.len()];
+
+    let simd_range = |pos| pos..pos+SIMD_WIDTH;
+
     let mut modified = true;
-    let w = input.width();
 
     while modified
     {
         modified = false;
-        // Todo write a 2d enumerate
-        for (i, (elem, neighbors)) in prev.neighbors8_with_padding(&'.').enumerate()
+
+        // Count neighbors
+        for y in PADDING..PADDING+input.height
         {
-            next[i/w][i%w] = match elem
-                {
-                    'L' => if neighbors.iter().filter(|&&&c| c == '#').count() == 0 { modified = true; '#' } else { 'L' },
-                    '#' => if neighbors.iter().filter(|&&&c| c == '#').count() >= 4 { modified = true; 'L' } else { '#' },
-                    _ => *elem
-                };
+            for x in (PADDING..input.width+PADDING).step_by(SIMD_WIDTH)
+            {
+                let pos = y * input.padded_width + x;
+                let mut counts = u8x64::splat(0);
+                // Sum up moving windows around our position, these correspond to the 8 neighbours
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width-1)]);
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width)]);
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width+1)]);
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos-1)]);
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos+1)]);
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width-1)]);
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width)]);
+                counts += u8x64::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width+1)]);
+                counts.write_to_slice_unaligned(&mut neighbor_counts[simd_range(pos)]);
+            }
         }
-        swap(&mut prev, &mut next);
-    }
 
-    prev.iter().filter(|&&c| c == '#').count()
-}
-
-#[aoc(day11, part1, part1_old)]
-pub fn part1_old(input : &InputType) -> usize
-{
-    let mut last = input.clone();
-
-    loop
-    {
-        let next = p1(&last);
-        if next == last
+        // Update seats
+        for y in PADDING..PADDING+input.height
         {
-            break;
-        }
-        else
-        {
-            last = next;
-        }
-    }
-
-    last.iter().filter(|&c| *c == '#').count()
-}
-
-pub fn p1(input : &InputType) -> Vec2<char>
-{
-    let mut data: Vec<char> = Vec::with_capacity(input.width() * input.height());
-    for y in 0..input.height()
-    {
-        for x in 0..input.width()
-        {
-            data.push(get_new(input, x, y));
+            for x in (PADDING..input.width+PADDING).step_by(SIMD_WIDTH)
+            {
+                let pos = y * input.padded_width + x;
+                let seats = u8x64::from_slice_unaligned(&occupied[simd_range(pos)]);
+                let counts = u8x64::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
+                let new_seats = seats.eq(u8x64::splat(0))
+                                    .select(counts.eq(u8x64::splat(0)).select(u8x64::splat(1), u8x64::splat(0))  //Empty seat: sit if no neighbours
+                                          , counts.ge(u8x64::splat(4)).select(u8x64::splat(0), u8x64::splat(1))) //Filled seat: stand if >=4 neighbours
+                                    & u8x64::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
+                new_seats.write_to_slice_unaligned(&mut occupied[simd_range(pos)]);
+                modified |= seats.ne(new_seats).any();
+            }
         }
     }
-
-    Vec2::from_vec(data, input.width())
-}
-
-pub fn get_new(input : &InputType, x:usize, y:usize) -> char
-{
-    let w = input.width() -1;
-    let h = input.height() -1;
-    let mut num_adj_occupied = 0;
-    if x > 0 && y > 0 && input[y-1][x-1] == '#' { num_adj_occupied += 1; }
-    if x > 0 && y < h && input[y+1][x-1] == '#' { num_adj_occupied += 1; }
-    if x < w && y > 0 && input[y-1][x+1] == '#' { num_adj_occupied += 1; }
-    if x < w && y < h && input[y+1][x+1] == '#' { num_adj_occupied += 1; }
-    if x > 0 && input[y][x-1] == '#' { num_adj_occupied += 1; }
-    if x < w && input[y][x+1] == '#' { num_adj_occupied += 1; }
-    if y > 0 && input[y-1][x] == '#' { num_adj_occupied += 1; }
-    if y < h && input[y+1][x] == '#' { num_adj_occupied += 1; }
-
-    if input[y][x] == 'L' && num_adj_occupied == 0 { '#' }
-    else if input[y][x] == '#' && num_adj_occupied >= 4 { 'L' }
-    else { input[y][x] }
-}
-
-#[aoc(day11, part2)]
-pub fn part2(input : &InputType) -> usize
-{
-    let mut last = input.clone();
-
-    loop
-    {
-        let next = p2(&last);
-        if next == last
-        {
-            break;
-        }
-        else
-        {
-            last = next;
-        }
-    }
-
-    last.iter().filter(|&c| *c == '#').count()
-}
-
-pub fn p2(input : &InputType) -> Vec2<char>
-{
-    let mut data: Vec<char> = Vec::with_capacity(input.width() * input.height());
-    for y in 0..input.height()
-    {
-        for x in 0..input.width()
-        {
-            data.push(get_new_2(input, x as i32, y as i32));
-        }
-    }
-
-    Vec2::from_vec(data, input.width())
-}
-
-pub fn get_new_2(input : &InputType, x:i32, y:i32) -> char
-{
-    let mut num_adj_occupied = 0;
-    if is_occ(input, x-1, y-1, -1, -1) { num_adj_occupied += 1; }
-    if is_occ(input, x-1, y+1, -1, 1) { num_adj_occupied += 1; }
-    if is_occ(input, x+1, y-1, 1, -1) { num_adj_occupied += 1; }
-    if is_occ(input, x+1, y+1, 1, 1) { num_adj_occupied += 1; }
-
-    if is_occ(input, x, y-1, 0, -1) { num_adj_occupied += 1; }
-    if is_occ(input, x, y+1, 0, 1) { num_adj_occupied += 1; }
-    if is_occ(input, x+1, y, 1, 0) { num_adj_occupied += 1; }
-    if is_occ(input, x-1, y, -1, 0) { num_adj_occupied += 1; }
-    
-
-    if input[y as usize][x as usize] == 'L' && num_adj_occupied == 0 { '#' }
-    else if input[y  as usize][x  as usize] == '#' && num_adj_occupied >= 5 { 'L' }
-    else { input[y  as usize][x as usize] }
-}
-
-pub fn is_occ(input : &InputType, x:i32, y:i32, dx:i32, dy:i32) -> bool
-{
-    if x < 0 || x as usize >= input.width() || y < 0 || y as usize >= input.height()
-    {
-        false
-    }
-    else
-    {
-        match input[y as usize][x as usize]
-        {
-            '#' => true,
-            'L' => false,
-            '.' => is_occ(input, x+dx, y+dy, dx, dy),
-            _ => unreachable!()
-        }
-    }
+    occupied.iter().filter(|&&s| s == 1u8).count()
 }
 
 #[cfg(test)]
@@ -168,17 +113,26 @@ mod tests
     use super::*;
 
     const TEST_DATA: &str = 
-"";
+"L.LL.LL.LL
+LLLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLLL
+L.LLLLLL.L
+L.LLLLL.LL";
 
     #[test]
     pub fn part1_test() 
     {
-        assert_eq!(part1(&parse_input(TEST_DATA)), 0)
+        assert_eq!(part1(&parse_input(TEST_DATA)), 37)
     }
 
     #[test]
     pub fn part2_test() 
     {
-        assert_eq!(part2(&parse_input(TEST_DATA)), 0)
+        //assert_eq!(part2(&parse_input(TEST_DATA)), 26)
     }
 }
