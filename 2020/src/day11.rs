@@ -28,7 +28,6 @@ pub fn parse_input(buf :&str) -> StateData
         seats.push(0);
     }
 
-    let mut i = 0;
     let mut bytes = buf.bytes().filter(|&c| c != b'\n');
     for _ in 0..height
     {
@@ -108,6 +107,101 @@ pub fn part1(input : &StateData) -> usize
     occupied.iter().filter(|&&s| s == 1u8).count()
 }
 
+#[aoc(day11, part2)]
+pub fn part2(input : &StateData) -> usize
+{
+    let mut occupied = vec![0; input.seats.len()];
+    let mut neighbor_counts = vec![0; input.seats.len()];
+
+    let mut remote_adjacencies: Vec<(usize, usize)> = Vec::with_capacity(input.seats.len() / 2);
+    let x_range = PADDING..input.width+PADDING;
+    let y_range = PADDING..PADDING+input.height;
+    let step_right = 1;
+    let step_down = input.padded_width;
+
+    // Build up remote adjacencies (>1 seat away)
+    for y in y_range.clone()
+    {
+        for x in x_range.clone()
+        {
+            let pos = y * input.padded_width + x;
+            if input.seats[pos] == 0 { continue; }
+
+            // scan right
+            let mut dist = 1;
+            while x + dist < x_range.end && input.seats[pos+step_right*dist] == 0 { dist += 1; }
+            if dist > 1 && input.seats[pos+step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_right*dist)); }
+
+            // scan botleft
+            dist = 1;
+            while x - dist >= x_range.start && y + dist < y_range.end  && input.seats[pos+step_down*dist-step_right*dist] == 0 { dist += 1; }
+            if dist > 1 && input.seats[pos+step_down*dist-step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist-step_right*dist)); }
+
+            // scan bot
+            dist = 1;
+            while y + dist < y_range.end && input.seats[pos+step_down*dist] == 0 { dist += 1; }
+            if dist > 1 && input.seats[pos+step_down*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist)); }
+
+            // scan botright
+            dist = 1;
+            while x + dist < x_range.end && y + dist < y_range.end  && input.seats[pos+step_down*dist+step_right*dist] == 0 { dist += 1; }
+            if dist > 1 && input.seats[pos+step_down*dist+step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist+step_right*dist)); }
+        }
+    }
+
+    let simd_range = |pos| pos..pos+SIMD_WIDTH;
+    let mut modified = true;
+    while modified
+    {
+        modified = false;
+
+        // Count neighbours
+        for y in y_range.clone()
+        {
+            for x in x_range.clone().step_by(SIMD_WIDTH)
+            {
+                let pos = y * input.padded_width + x;
+                let mut counts = U8Vec::splat(0);
+                // Sum up moving windows around our position, these correspond to the 8 neighbours
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_down-step_right)]);
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_down)]);
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_down+step_right)]);
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_right)]);
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_right)]);
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_down-step_right)]);
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_down)]);
+                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_down+step_right)]);
+                counts.write_to_slice_unaligned(&mut neighbor_counts[simd_range(pos)]);
+            }
+        }
+
+        // Check remote pairs
+        for (s1,s2) in &remote_adjacencies
+        {
+            neighbor_counts[*s1] += occupied[*s2];
+            neighbor_counts[*s2] += occupied[*s1];
+        }
+
+        // Update seats
+        for y in y_range.clone()
+        {
+            for x in x_range.clone().step_by(SIMD_WIDTH)
+            {
+                let pos = y * input.padded_width + x;
+                let seats = U8Vec::from_slice_unaligned(&occupied[simd_range(pos)]);
+                let counts = U8Vec::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
+                let new_seats = seats.eq(U8Vec::splat(0))
+                                    .select(counts.eq(U8Vec::splat(0)).select(U8Vec::splat(1), U8Vec::splat(0))  //Empty seat: sit if no neighbours
+                                          , counts.ge(U8Vec::splat(5)).select(U8Vec::splat(0), U8Vec::splat(1))) //Filled seat: stand if >=4 neighbours
+                                    & U8Vec::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
+                new_seats.write_to_slice_unaligned(&mut occupied[simd_range(pos)]);
+                modified |= seats.ne(new_seats).any();
+            }
+        }
+    }
+    occupied.iter().filter(|&&s| s == 1u8).count()
+}
+
 #[cfg(test)]
 mod tests 
 {
@@ -134,6 +228,6 @@ L.LLLLL.LL";
     #[test]
     pub fn part2_test() 
     {
-        //assert_eq!(part2(&parse_input(TEST_DATA)), 26)
+        assert_eq!(part2(&parse_input(TEST_DATA)), 26)
     }
 }

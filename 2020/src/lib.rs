@@ -6,6 +6,7 @@ extern crate fn_memo;
 extern crate itertools;
 extern crate nom;
 extern crate text_io;
+extern crate packed_simd;
 
 pub mod vec2;
 
