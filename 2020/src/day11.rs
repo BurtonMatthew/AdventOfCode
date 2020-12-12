@@ -67,7 +67,7 @@ pub fn part1(input : &StateData) -> usize
     {
         modified = false;
 
-        // Count neighbors
+        // Count neighbours
         for y in PADDING..PADDING+input.height
         {
             for x in (PADDING..input.width+PADDING).step_by(SIMD_WIDTH)
