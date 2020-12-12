@@ -123,6 +123,11 @@ impl<T> Vec2<T>
     {
         self.data.iter()
     }
+
+    pub fn neighbors8_with_padding<'a>(&'a self, padding: &'a T) -> Neighborhood8Iter<T>
+    {
+        Neighborhood8Iter { vec: self, x: 0, y: 0, padding }
+    }
 }
 
 pub struct RowIter<'a, T:'a>
@@ -141,6 +146,56 @@ impl<'a, T> Iterator for RowIter<'a, T>
         {
             let result = Some(&self.vec[self.index]);
             self.index += 1;
+            result
+        }
+        else
+        {
+            None
+        }
+    }
+}
+
+pub struct Neighborhood8Iter<'a, T:'a>
+{
+    vec: &'a Vec2<T>,
+    padding: &'a T,
+    x: usize,
+    y: usize
+}
+
+impl<'a, T> Iterator for Neighborhood8Iter<'a, T>
+{
+    type Item = (&'a T, [&'a T; 8]);
+
+    fn next(&mut self) -> Option<Self::Item>
+    {
+        if (self.y as usize) < self.vec.height()
+        {
+            let is_left_edge = self.x == 0;
+            let is_right_edge = self.x == self.vec.width()-1;
+            let is_top_edge = self.y == 0;
+            let is_bot_edge = self.y == self.vec.height()-1;
+
+            let top =       if !is_top_edge { &self.vec[self.y-1][self.x] } else { self.padding };
+            let top_right = if !is_top_edge && !is_right_edge { &self.vec[self.y-1][self.x+1] } else { self.padding };
+            let right =     if !is_right_edge { &self.vec[self.y][self.x+1] } else { self.padding };
+            let bot_right = if !is_bot_edge &&!is_right_edge { &self.vec[self.y+1][self.x+1] } else { self.padding };
+            let bot =       if !is_bot_edge { &self.vec[self.y+1][self.x] } else { self.padding };
+            let bot_left =  if !is_bot_edge && !is_left_edge { &self.vec[self.y+1][self.x-1] } else { self.padding };
+            let left =      if !is_left_edge { &self.vec[self.y][self.x-1] } else { self.padding };
+            let top_left =  if !is_top_edge && !is_left_edge { &self.vec[self.y-1][self.x-1] } else { self.padding };
+
+            let result = Some((&self.vec[self.y][self.x], [top, top_right, right, bot_right, bot, bot_left, left, top_left]));
+
+            if is_right_edge
+            {
+                self.x = 0;
+                self.y += 1;
+            }
+            else
+            {
+                self.x += 1;
+            }
             result
         }
         else

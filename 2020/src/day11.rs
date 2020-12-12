@@ -1,9 +1,5 @@
-use std::str::FromStr;
-use std::collections::HashSet;
-use std::collections::VecDeque;
-use itertools::Itertools;
-use text_io::scan;
 use vec2::Vec2;
+use std::mem::swap;
 
 // 2D character grid
 type InputType = Vec2<char>;
@@ -16,9 +12,36 @@ pub fn parse_input(buf : &str) -> InputType
 #[aoc(day11, part1)]
 pub fn part1(input : &InputType) -> usize
 {
+    let mut prev = input.clone();
+    let mut next = input.clone();
+    let mut modified = true;
+    let w = input.width();
+
+    while modified
+    {
+        modified = false;
+        // Todo write a 2d enumerate
+        for (i, (elem, neighbors)) in prev.neighbors8_with_padding(&'.').enumerate()
+        {
+            next[i/w][i%w] = match elem
+                {
+                    'L' => if neighbors.iter().filter(|&&&c| c == '#').count() == 0 { modified = true; '#' } else { 'L' },
+                    '#' => if neighbors.iter().filter(|&&&c| c == '#').count() >= 4 { modified = true; 'L' } else { '#' },
+                    _ => *elem
+                };
+        }
+        swap(&mut prev, &mut next);
+    }
+
+    prev.iter().filter(|&&c| c == '#').count()
+}
+
+#[aoc(day11, part1, part1_old)]
+pub fn part1_old(input : &InputType) -> usize
+{
     let mut last = input.clone();
 
-    while true
+    loop
     {
         let next = p1(&last);
         if next == last
@@ -36,7 +59,7 @@ pub fn part1(input : &InputType) -> usize
 
 pub fn p1(input : &InputType) -> Vec2<char>
 {
-    let mut data: Vec<char> = Vec::new();
+    let mut data: Vec<char> = Vec::with_capacity(input.width() * input.height());
     for y in 0..input.height()
     {
         for x in 0..input.width()
@@ -72,7 +95,7 @@ pub fn part2(input : &InputType) -> usize
 {
     let mut last = input.clone();
 
-    while true
+    loop
     {
         let next = p2(&last);
         if next == last
@@ -90,7 +113,7 @@ pub fn part2(input : &InputType) -> usize
 
 pub fn p2(input : &InputType) -> Vec2<char>
 {
-    let mut data: Vec<char> = Vec::new();
+    let mut data: Vec<char> = Vec::with_capacity(input.width() * input.height());
     for y in 0..input.height()
     {
         for x in 0..input.width()
@@ -104,8 +127,6 @@ pub fn p2(input : &InputType) -> Vec2<char>
 
 pub fn get_new_2(input : &InputType, x:i32, y:i32) -> char
 {
-    let w = input.width() -1;
-    let h = input.height() -1;
     let mut num_adj_occupied = 0;
     if is_occ(input, x-1, y-1, -1, -1) { num_adj_occupied += 1; }
     if is_occ(input, x-1, y+1, -1, 1) { num_adj_occupied += 1; }
