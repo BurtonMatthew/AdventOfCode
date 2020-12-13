@@ -1,3 +1,5 @@
+use std::mem::swap;
+
 #[derive(Debug, Clone, Copy)]
 pub enum Op
 {
@@ -94,8 +96,8 @@ pub fn part2(input : &InputType) -> i32
             Op::W(n) => { w_x -= n; },
             Op::E(n) => { w_x += n; },
             Op::F(n) => { x += w_x * n; y += w_y * n }
-            Op::R(n) => { for _ in 0..n/90 { let t = w_y; w_y = w_x; w_x = -t; } },
-            Op::L(n) => { for _ in 0..n/90 { let t = w_x; w_x = w_y; w_y = -t; } },
+            Op::R(n) => { for _ in 0..n/90 { swap(&mut w_x, &mut w_y); w_x *= -1; } },
+            Op::L(n) => { for _ in 0..n/90 { swap(&mut w_x, &mut w_y); w_y *= -1; } },
         }
     }
 
