@@ -1,4 +1,5 @@
 use packed_simd::u8x32;
+use packed_simd::FromCast;
 
 const PADDING: usize = 2;
 type U8SimdVec = u8x32;
@@ -99,8 +100,8 @@ pub fn part1(input : &StateData) -> usize
                 let seats = U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos)]);
                 let counts = U8SimdVec::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
                 let new_seats = seats.eq(U8SimdVec::splat(0))
-                                    .select(counts.eq(U8SimdVec::splat(0)).select(U8SimdVec::splat(1), U8SimdVec::splat(0))  //Empty seat: sit if no neighbours
-                                          , counts.ge(U8SimdVec::splat(4)).select(U8SimdVec::splat(0), U8SimdVec::splat(1))) //Filled seat: stand if >=4 neighbours
+                                    .select(U8SimdVec::from_cast(counts.eq(U8SimdVec::splat(0)))  //Empty seat: sit if no neighbours
+                                          , U8SimdVec::from_cast(counts.lt(U8SimdVec::splat(4)))) //Filled seat: stand if >=4 neighbours
                                     & U8SimdVec::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
                 new_seats.write_to_slice_unaligned(&mut occupied[simd_range(pos)]);
                 modified |= seats.ne(new_seats).any();
@@ -122,7 +123,7 @@ pub fn part2(input : &StateData) -> usize
     let step_right = 1;
     let step_down = input.padded_width;
 
-    // Build up remote adjacencies (>1 seat away)
+    // Build up remote adjacencies (>2 seat away)
     for y in y_range.clone()
     {
         for x in x_range.clone()
@@ -223,8 +224,8 @@ pub fn part2(input : &StateData) -> usize
                 let seats = U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos)]);
                 let counts = U8SimdVec::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
                 let new_seats = seats.eq(U8SimdVec::splat(0))
-                                    .select(counts.eq(U8SimdVec::splat(0)).select(U8SimdVec::splat(1), U8SimdVec::splat(0))  //Empty seat: sit if no neighbours
-                                          , counts.ge(U8SimdVec::splat(5)).select(U8SimdVec::splat(0), U8SimdVec::splat(1))) //Filled seat: stand if >=5 neighbours
+                                    .select(U8SimdVec::from_cast(counts.eq(U8SimdVec::splat(0)))  //Empty seat: sit if no neighbours
+                                        , U8SimdVec::from_cast(counts.lt(U8SimdVec::splat(5)))) //Filled seat: stand if >=5 neighbours
                                     & U8SimdVec::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
                 new_seats.write_to_slice_unaligned(&mut occupied[simd_range(pos)]);
                 modified |= seats.ne(new_seats).any();
