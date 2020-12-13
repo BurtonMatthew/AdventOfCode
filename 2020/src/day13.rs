@@ -45,7 +45,56 @@ pub fn part2(input : &InputType) -> i64
     chinese_remainder(&residues, &modulii).unwrap()
 }
 
+#[aoc(day13, part2, part2_lcm)]
+pub fn part2_lcm(input : &InputType) -> usize
+{
+    let mut t = 0;
+    let mut period = input.busses[0].unwrap(); // todo: handle first bus being bad?
+    let mut i = 1;
+    while i < input.busses.len()
+    {
+        // Skip past non-busses
+        if input.busses[i].is_none() 
+        { 
+            i += 1; 
+            continue;
+        }
+        let bus = input.busses[i].unwrap();
+        if (t+i) % bus == 0
+        {
+            period = lcm(period,bus);
+            i += 1;
+        }
+        else
+        {
+            t = t + period;
+        }
+    }
+
+    t
+}
+
 // Rosetta code
+use std::cmp::{max, min};
+ 
+fn gcd(a: usize, b: usize) -> usize {
+    match ((a, b), (a & 1, b & 1)) {
+        ((x, y), _) if x == y => y,
+        ((0, x), _) | ((x, 0), _) => x,
+        ((x, y), (0, 1)) | ((y, x), (1, 0)) => gcd(x >> 1, y),
+        ((x, y), (0, 0)) => gcd(x >> 1, y >> 1) << 1,
+        ((x, y), (1, 1)) => {
+            let (x, y) = (min(x, y), max(x, y));
+            gcd((y - x) >> 1, x)
+        }
+        _ => unreachable!(),
+    }
+}
+ 
+fn lcm(a: usize, b: usize) -> usize {
+    a * b / gcd(a, b)
+}
+
 fn egcd(a: i64, b: i64) -> (i64, i64, i64) {
     if a == 0 {
         (b, 0, 1)
