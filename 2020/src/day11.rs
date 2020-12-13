@@ -1,8 +1,8 @@
 use packed_simd::u8x32;
 
 const PADDING: usize = 1;
-type U8Vec = u8x32;
-const SIMD_WIDTH: usize = std::mem::size_of::<U8Vec>();
+type U8SimdVec = u8x32;
+const SIMD_WIDTH: usize = std::mem::size_of::<U8SimdVec>();
 
 pub struct StateData
 {
@@ -73,16 +73,16 @@ pub fn part1(input : &StateData) -> usize
             for x in (PADDING..input.width+PADDING).step_by(SIMD_WIDTH)
             {
                 let pos = y * input.padded_width + x;
-                let mut counts = U8Vec::splat(0);
+                let mut counts = U8SimdVec::splat(0);
                 // Sum up moving windows around our position, these correspond to the 8 neighbours
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width-1)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width+1)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-1)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+1)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width-1)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width+1)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width-1)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-input.padded_width+1)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-1)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+1)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width-1)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+input.padded_width+1)]);
                 counts.write_to_slice_unaligned(&mut neighbor_counts[simd_range(pos)]);
             }
         }
@@ -93,12 +93,12 @@ pub fn part1(input : &StateData) -> usize
             for x in (PADDING..input.width+PADDING).step_by(SIMD_WIDTH)
             {
                 let pos = y * input.padded_width + x;
-                let seats = U8Vec::from_slice_unaligned(&occupied[simd_range(pos)]);
-                let counts = U8Vec::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
-                let new_seats = seats.eq(U8Vec::splat(0))
-                                    .select(counts.eq(U8Vec::splat(0)).select(U8Vec::splat(1), U8Vec::splat(0))  //Empty seat: sit if no neighbours
-                                          , counts.ge(U8Vec::splat(4)).select(U8Vec::splat(0), U8Vec::splat(1))) //Filled seat: stand if >=4 neighbours
-                                    & U8Vec::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
+                let seats = U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos)]);
+                let counts = U8SimdVec::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
+                let new_seats = seats.eq(U8SimdVec::splat(0))
+                                    .select(counts.eq(U8SimdVec::splat(0)).select(U8SimdVec::splat(1), U8SimdVec::splat(0))  //Empty seat: sit if no neighbours
+                                          , counts.ge(U8SimdVec::splat(4)).select(U8SimdVec::splat(0), U8SimdVec::splat(1))) //Filled seat: stand if >=4 neighbours
+                                    & U8SimdVec::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
                 new_seats.write_to_slice_unaligned(&mut occupied[simd_range(pos)]);
                 modified |= seats.ne(new_seats).any();
             }
@@ -161,16 +161,16 @@ pub fn part2(input : &StateData) -> usize
             for x in x_range.clone().step_by(SIMD_WIDTH)
             {
                 let pos = y * input.padded_width + x;
-                let mut counts = U8Vec::splat(0);
+                let mut counts = U8SimdVec::splat(0);
                 // Sum up moving windows around our position, these correspond to the 8 neighbours
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_down-step_right)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_down)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_down+step_right)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos-step_right)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_right)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_down-step_right)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_down)]);
-                counts += U8Vec::from_slice_unaligned(&occupied[simd_range(pos+step_down+step_right)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down-step_right)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down+step_right)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_right)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_right)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down-step_right)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down)]);
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down+step_right)]);
                 counts.write_to_slice_unaligned(&mut neighbor_counts[simd_range(pos)]);
             }
         }
@@ -188,12 +188,12 @@ pub fn part2(input : &StateData) -> usize
             for x in x_range.clone().step_by(SIMD_WIDTH)
             {
                 let pos = y * input.padded_width + x;
-                let seats = U8Vec::from_slice_unaligned(&occupied[simd_range(pos)]);
-                let counts = U8Vec::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
-                let new_seats = seats.eq(U8Vec::splat(0))
-                                    .select(counts.eq(U8Vec::splat(0)).select(U8Vec::splat(1), U8Vec::splat(0))  //Empty seat: sit if no neighbours
-                                          , counts.ge(U8Vec::splat(5)).select(U8Vec::splat(0), U8Vec::splat(1))) //Filled seat: stand if >=4 neighbours
-                                    & U8Vec::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
+                let seats = U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos)]);
+                let counts = U8SimdVec::from_slice_unaligned(&neighbor_counts[simd_range(pos)]);
+                let new_seats = seats.eq(U8SimdVec::splat(0))
+                                    .select(counts.eq(U8SimdVec::splat(0)).select(U8SimdVec::splat(1), U8SimdVec::splat(0))  //Empty seat: sit if no neighbours
+                                          , counts.ge(U8SimdVec::splat(5)).select(U8SimdVec::splat(0), U8SimdVec::splat(1))) //Filled seat: stand if >=5 neighbours
+                                    & U8SimdVec::from_slice_unaligned(&input.seats[simd_range(pos)]); //Zero out anything that isn't an actual seat
                 new_seats.write_to_slice_unaligned(&mut occupied[simd_range(pos)]);
                 modified |= seats.ne(new_seats).any();
             }
