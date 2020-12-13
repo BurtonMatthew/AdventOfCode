@@ -1,12 +1,13 @@
 use packed_simd::u8x32;
 
-const PADDING: usize = 1;
+const PADDING: usize = 2;
 type U8SimdVec = u8x32;
 const SIMD_WIDTH: usize = std::mem::size_of::<U8SimdVec>();
 
 pub struct StateData
 {
     seats: Vec<u8>,
+    floors: Vec<u8>,
     width: usize,
     height: usize,
     padded_width: usize,
@@ -50,7 +51,9 @@ pub fn parse_input(buf :&str) -> StateData
         seats.push(0);
     }
 
-    StateData{seats, width, height, padded_width}
+    let floors = seats.iter().map(|i| i ^ 1).collect();
+
+    StateData{seats, floors, width, height, padded_width}
 }
 
 #[aoc(day11, part1)]
@@ -130,22 +133,22 @@ pub fn part2(input : &StateData) -> usize
             // scan right
             let mut dist = 1;
             while x + dist < x_range.end && input.seats[pos+step_right*dist] == 0 { dist += 1; }
-            if dist > 1 && input.seats[pos+step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_right*dist)); }
+            if dist > 2 && input.seats[pos+step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_right*dist)); }
 
             // scan botleft
             dist = 1;
             while x - dist >= x_range.start && y + dist < y_range.end  && input.seats[pos+step_down*dist-step_right*dist] == 0 { dist += 1; }
-            if dist > 1 && input.seats[pos+step_down*dist-step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist-step_right*dist)); }
+            if dist > 2 && input.seats[pos+step_down*dist-step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist-step_right*dist)); }
 
             // scan bot
             dist = 1;
             while y + dist < y_range.end && input.seats[pos+step_down*dist] == 0 { dist += 1; }
-            if dist > 1 && input.seats[pos+step_down*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist)); }
+            if dist > 2 && input.seats[pos+step_down*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist)); }
 
             // scan botright
             dist = 1;
             while x + dist < x_range.end && y + dist < y_range.end  && input.seats[pos+step_down*dist+step_right*dist] == 0 { dist += 1; }
-            if dist > 1 && input.seats[pos+step_down*dist+step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist+step_right*dist)); }
+            if dist > 2 && input.seats[pos+step_down*dist+step_right*dist] == 1 { remote_adjacencies.push((pos, pos+step_down*dist+step_right*dist)); }
         }
     }
 
@@ -162,15 +165,44 @@ pub fn part2(input : &StateData) -> usize
             {
                 let pos = y * input.padded_width + x;
                 let mut counts = U8SimdVec::splat(0);
-                // Sum up moving windows around our position, these correspond to the 8 neighbours
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down-step_right)]);
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down)]);
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down+step_right)]);
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_right)]);
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_right)]);
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down-step_right)]);
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down)]);
-                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down+step_right)]);
+                // Sum up moving windows around our position, these correspond to a 5x5 convolution
+                // Where logic for the right side would be x = occupied[x+1] || occupied[x+2] && floor[x+1]
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down-step_right)])
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down*2-step_right*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos-step_down-step_right)]);
+                    
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down)])
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos-step_down)]);
+
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down+step_right)])
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_down*2+step_right*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos-step_down+step_right)]);
+
+
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_right)])
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos-step_right*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos-step_right)]);
+
+
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_right)]) 
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_right*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos+step_right)]);
+
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down-step_right)])
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down*2-step_right*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos+step_down-step_right)]);
+
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down)])
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos+step_down)]);
+
+
+                counts += U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down+step_right)])
+                    | U8SimdVec::from_slice_unaligned(&occupied[simd_range(pos+step_down*2+step_right*2)]) 
+                    &  U8SimdVec::from_slice_unaligned(&input.floors[simd_range(pos+step_down+step_right)]);
+
+
                 counts.write_to_slice_unaligned(&mut neighbor_counts[simd_range(pos)]);
             }
         }
