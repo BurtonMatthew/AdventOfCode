@@ -7,6 +7,7 @@ extern crate itertools;
 extern crate nom;
 extern crate text_io;
 extern crate packed_simd;
+extern crate pathfinding;
 
 pub mod vec2;
 

@@ -4,6 +4,7 @@ use std::collections::VecDeque;
 use itertools::Itertools;
 use text_io::scan;
 use vec2::Vec2;
+use pathfinding::prelude::{astar};
 
 
 #[aoc(dayX, part1)]
