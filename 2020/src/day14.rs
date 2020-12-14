@@ -132,7 +132,6 @@ pub fn part2_xmask_cache(input : &InputType) -> usize
                         }
                         else
                         {
-
                             for i in 0..x_masks.len()
                             {
                                 let old_mask = x_masks[i];
