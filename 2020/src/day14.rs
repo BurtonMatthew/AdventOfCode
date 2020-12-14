@@ -62,8 +62,8 @@ pub fn part1(input : &InputType) -> usize
     mem.values().sum()
 }
 
-#[aoc(day14, part2)]
-pub fn part2(input : &InputType) -> usize
+#[aoc(day14, part2, part2_addr_list)]
+pub fn part2_addr_list(input : &InputType) -> usize
 {
     let mut mem: HashMap<usize, usize> = HashMap::new();
     let mut set_mask = 0;
@@ -95,6 +95,60 @@ pub fn part2(input : &InputType) -> usize
                 for address in addresses
                 {
                     mem.insert(address, *val);
+                }
+            }
+        }
+    }
+    
+    mem.values().sum()
+}
+
+#[aoc(day14, part2, part2_xmask_cache)]
+pub fn part2_xmask_cache(input : &InputType) -> usize
+{
+    let mut mem: HashMap<usize, usize> = HashMap::new();
+    let mut set_mask = 0;
+    let mut x_masks: Vec<(usize, usize)> = Vec::with_capacity(1024);
+
+    for op in input
+    {
+        match op
+        {
+            Op::Mask(_, set, x_mask) => 
+            { 
+                set_mask = *set; 
+                x_masks.clear();
+
+                for bit in 0..36
+                {
+                    if x_mask & (1 << bit) != 0
+                    {
+                        let bit_mask = 1 << bit;
+
+                        if x_masks.len() == 0
+                        {
+                            x_masks.push((0, bit_mask));
+                            x_masks.push((bit_mask, 0));
+                        }
+                        else
+                        {
+
+                            for i in 0..x_masks.len()
+                            {
+                                let old_mask = x_masks[i];
+                                x_masks[i] = (old_mask.0 | bit_mask, old_mask.1);
+                                x_masks.push((old_mask.0, old_mask.1 | bit_mask));
+                            }
+                        }
+                    }
+                }
+            }
+            Op::Write(addr, val) =>
+            {
+                let masked_addr = addr | set_mask;
+                for (clr, set) in &x_masks
+                {
+                    mem.insert(masked_addr & !clr | set, *val);
                 }
             }
         }
