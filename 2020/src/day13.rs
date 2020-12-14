@@ -133,7 +133,7 @@ mod tests
 
     const TEST_DATA: &str = 
 "939
-7,13,0,0,59,0,31,19";
+7,13,x,x,59,x,31,19";
 
     #[test]
     pub fn part1_test() 
