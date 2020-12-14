@@ -38,7 +38,7 @@ pub fn part2(input : &InputType) -> i64
         if let Some(x) = bus
         {
             modulii.push(*x as i64);
-            residues.push((x - i) as i64);
+            residues.push(*x as i64 - i as i64);
         }
     }
 
