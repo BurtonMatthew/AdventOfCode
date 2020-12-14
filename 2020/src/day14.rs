@@ -3,7 +3,7 @@ use std::collections::HashMap;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Op
 {
-    Mask([Option<bool>; 36]),
+    Mask(usize, usize, usize),
     Write(usize, usize)
 }
 
@@ -16,17 +16,21 @@ pub fn parse_input(buf :&str) -> InputType
     {
         if line.starts_with("mask")
         {
-            let mut mask = [None; 36];
+            let mut clear_mask = 0;
+            let mut set_mask = 0;
+            let mut x_mask = 0;
+
             for (i,b) in line.chars().skip(7).enumerate()
             {
                 match b
                 {
-                    '0' => { mask[i] = Some(false); }
-                    '1' => { mask[i] = Some(true);}
-                    _ => {}
+                    '0' => { clear_mask |= 1 << (35-i); }
+                    '1' => { set_mask |= 1 << (35-i); }
+                    'X' => { x_mask |= 1 << (35-i); }
+                    _ => unreachable!()
                 }
             }
-            Op::Mask(mask)
+            Op::Mask(clear_mask, set_mask, x_mask)
         }
         else
         {
@@ -43,30 +47,15 @@ pub fn parse_input(buf :&str) -> InputType
 pub fn part1(input : &InputType) -> usize
 {
     let mut mem: HashMap<usize, usize> = HashMap::new();
-    let mut mask: [Option<bool>; 36] = [None; 36];
+    let mut clear_mask = 0;
+    let mut set_mask = 0;
 
     for op in input
     {
         match op
         {
-            Op::Mask(m) => { mask = m.clone(); }
-            Op::Write(addr, val) =>
-            {
-                let mut v = *val;
-                for(i, b) in mask.iter().rev().enumerate()
-                {
-                    if let Some(x) = b
-                    {
-                        match x
-                        {
-                            false => { v &= !(1 << i ); },
-                            true => { v |= 1 << i },
-                        }
-                    }
-
-                    mem.insert(*addr, v);
-                }
-            }
+            Op::Mask(clr, set, _) => { clear_mask = *clr; set_mask = *set; }
+            Op::Write(addr, val) => { mem.insert(*addr, val & !clear_mask | set_mask); }
         }
     }
     
@@ -77,42 +66,35 @@ pub fn part1(input : &InputType) -> usize
 pub fn part2(input : &InputType) -> usize
 {
     let mut mem: HashMap<usize, usize> = HashMap::new();
-    let mut mask: [Option<bool>; 36] = [None; 36];
+    let mut set_mask = 0;
+    let mut x_mask = 0;
 
     for op in input
     {
         match op
         {
-            Op::Mask(m) => { mask = m.clone(); }
+            Op::Mask(_, set, x) => { set_mask = *set; x_mask = *x; }
             Op::Write(addr, val) =>
             {
-                let iterations = 2usize.pow(mask.iter().filter(|b| b.is_none()).count() as u32);
-                for ia in 0..iterations
+                let bits = 2usize.pow(x_mask.count_ones());
+                let mut addresses = Vec::with_capacity(bits);
+                addresses.push(addr | set_mask);
+                for bit in 0..36
                 {
-                    let mut floating_addr = *addr;
-                    let mut num_xs = 0;
-                    for(i, b) in mask.iter().rev().enumerate()
+                    if x_mask & (1 << bit) != 0
                     {
-                        if let Some(x) = b
+                        for i in 0..addresses.len()
                         {
-                            match x
-                            {
-                                false => {  },
-                                true => { floating_addr |= 1 << i },
-                            }
-                        }
-                        else
-                        {
-                            match ia & (1 << num_xs) != 0
-                            {
-                                false => { floating_addr &= !(1 << i ); },
-                                true => { floating_addr |= 1 << i },
-                            }
-                            num_xs += 1;
+                            let set = 1 << bit;
+                            let clr = !set;
+                            addresses.push(addresses[i] | set);
+                            addresses[i] &= clr;
                         }
                     }
-
-                    mem.insert(floating_addr, *val);
+                }
+                for address in addresses
+                {
+                    mem.insert(address, *val);
                 }
             }
         }
