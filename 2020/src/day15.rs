@@ -62,7 +62,7 @@ pub fn part2(input : &InputType) -> usize
         t += 1;
     }
 
-    for t in t..30000001
+    for t in t..30000000
     {
         prev_spoken = spoken;
         if map.contains_key(&spoken)
