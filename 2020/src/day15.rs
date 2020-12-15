@@ -14,7 +14,7 @@ pub fn part1(input : &InputType) -> usize
 
     let mut t = 0;
     let mut spoken = *input.last().unwrap();
-    let mut prev_spoken = spoken;
+    let mut prev_spoken;
 
     for i in 0..input.len()
     {
@@ -51,7 +51,7 @@ pub fn part2(input : &InputType) -> usize
 
     let mut t = 0;
     let mut spoken = *input.last().unwrap();
-    let mut prev_spoken = spoken;
+    let mut prev_spoken;
 
     for i in 0..input.len()
     {
