@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 type InputType = Vec<usize>;
 #[aoc_generator(day15)]
 pub fn parse_input(buf :&str) -> InputType
@@ -10,17 +8,16 @@ pub fn parse_input(buf :&str) -> InputType
 #[aoc(day15, part1)]
 pub fn part1(input : &InputType) -> usize
 {
-    let mut map = HashMap::new();
-
     let mut t = 0;
     let mut spoken = *input.last().unwrap();
     let mut prev_spoken;
 
+    let mut map: Vec<i32> = vec![-1; 2020];
     for i in 0..input.len()
     {
         if i != input.len()-1
         {
-            map.insert(input[i], t);
+            map[input[i]] = t;
         }
         t += 1;
     }
@@ -28,17 +25,17 @@ pub fn part1(input : &InputType) -> usize
     for t in t..2020
     {
         prev_spoken = spoken;
-        if map.contains_key(&spoken)
+        if map[spoken as usize] != -1
         {
-            let speak = t - map.get(&spoken).unwrap() -1;
-            spoken = speak;
+            let speak = t - map[spoken as usize] -1;
+            spoken = speak as usize;
         }
         else
         {
             spoken = 0;
         }
 
-        map.insert(prev_spoken, t-1);
+        map[prev_spoken as usize] = t-1;
     }
 
     spoken
@@ -47,17 +44,16 @@ pub fn part1(input : &InputType) -> usize
 #[aoc(day15, part2)]
 pub fn part2(input : &InputType) -> usize
 {
-    let mut map = HashMap::new();
-
     let mut t = 0;
     let mut spoken = *input.last().unwrap();
     let mut prev_spoken;
 
+    let mut map: Vec<i32> = vec![-1; 30000000];
     for i in 0..input.len()
     {
         if i != input.len()-1
         {
-            map.insert(input[i], t);
+            map[input[i]] = t;
         }
         t += 1;
     }
@@ -65,17 +61,17 @@ pub fn part2(input : &InputType) -> usize
     for t in t..30000000
     {
         prev_spoken = spoken;
-        if map.contains_key(&spoken)
+        if map[spoken as usize] != -1
         {
-            let speak = t - map.get(&spoken).unwrap() -1;
-            spoken = speak;
+            let speak = t - map[spoken as usize] -1;
+            spoken = speak as usize;
         }
         else
         {
             spoken = 0;
         }
 
-        map.insert(prev_spoken, t-1);
+        map[prev_spoken as usize] = t-1;
     }
 
     spoken
