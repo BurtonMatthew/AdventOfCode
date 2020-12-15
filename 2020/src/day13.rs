@@ -34,18 +34,18 @@ pub fn part2(input : &InputType) -> isize
 {
     let mut t = 0;
     let mut period = 0;
-    let mut indexed_busses_sorted = input.busses.iter().enumerate().filter_map(|(i, &b)| Some((i,b?))).sorted_by(|(_,b1), (_,b2)| b2.cmp(b1));
+    let mut indexed_busses_sorted = input.busses.iter().enumerate().filter_map(|(i, &b)| Some((i as isize,b? as isize))).sorted_by(|(_,b1), (_,b2)| b2.cmp(b1));
     if let Some((i,b)) =  indexed_busses_sorted.next()
     {
-        t = t-i as isize;
+        t = t-i;
         period = b;
     }
 
     for (i,b) in indexed_busses_sorted
     {
-        while (t+i as isize) % b as isize != 0
+        while (t+i) % b != 0
         {
-            t = t + period as isize;
+            t = t + period;
         }
         period = period *b; // Should LCM but all busses prime
     }
