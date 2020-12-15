@@ -183,6 +183,6 @@ mem[26] = 1";
     #[test]
     pub fn part2_test() 
     {
-        assert_eq!(part2(&parse_input(TEST_DATA_2)), 208)
+        assert_eq!(part2_addr_list(&parse_input(TEST_DATA_2)), 208)
     }
 }
