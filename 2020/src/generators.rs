@@ -5,7 +5,7 @@ type InputType = Vec<String>;
 #[aoc_generator(dayX)]
 pub fn parse_input(buf :&str) -> InputType
 {
-    buf.lines().collect()
+    buf.lines().map(|s| s.to_string()).collect()
 }
 
 // Parsed lines

@@ -5,7 +5,7 @@ use itertools::Itertools;
 use text_io::scan;
 use vec2::Vec2;
 use pathfinding::prelude::{astar};
-
+use std::collections::HashMap;
 
 #[aoc(dayX, part1)]
 pub fn part1(input : &InputType) -> usize
