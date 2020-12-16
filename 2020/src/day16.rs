@@ -126,7 +126,7 @@ pub fn part2(input : &InputType) -> usize
                 {
                     if let Some(pos) = possible_indices[j].iter().position(|x| *x == index) 
                     {
-                        possible_indices[j].remove(pos);
+                        possible_indices[j].swap_remove(pos);
                     }
                 }
                 correct_indices[i] = index;
