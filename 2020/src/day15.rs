@@ -61,9 +61,9 @@ pub fn part2(input : &InputType) -> usize
     for t in t..30000000
     {
         prev_spoken = spoken;
-        if map[spoken as usize] != -1
+        if map[spoken] != -1
         {
-            let speak = t - map[spoken as usize] -1;
+            let speak = t - map[spoken] -1;
             spoken = speak as usize;
         }
         else
@@ -71,7 +71,7 @@ pub fn part2(input : &InputType) -> usize
             spoken = 0;
         }
 
-        map[prev_spoken as usize] = t-1;
+        map[prev_spoken] = t-1;
     }
 
     spoken
