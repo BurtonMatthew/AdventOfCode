@@ -1,4 +1,6 @@
+use std::mem::swap;
 use vec2::Vec2;
+use ndarray::prelude::*;
 
 // 2D character grid
 type InputType = Vec2<char>;
@@ -63,7 +65,7 @@ pub fn part1(input : &InputType) -> usize
                 }
             }
         }
-        cubes = new_cubes.clone();
+        swap(&mut cubes, &mut new_cubes);
     }
 
     let mut active = 0;
@@ -143,7 +145,7 @@ pub fn part2(input : &InputType) -> usize
                 }
             }
         }
-        cubes = new_cubes.clone();
+        swap(&mut cubes, &mut new_cubes);
     }
 
     let mut active = 0;
@@ -164,6 +166,66 @@ pub fn part2(input : &InputType) -> usize
         }
     }
     active
+}
+
+#[aoc(day17, part1, part1_generic)]
+pub fn part1_generic(input : &InputType) -> usize
+{
+    generic_solver::<3>(&input, 6)
+}
+
+#[aoc(day17, part2, part2_generic)]
+pub fn part2_generic(input : &InputType) -> usize
+{
+    generic_solver::<4>(&input, 6)
+}
+
+pub fn generic_solver<const NUM_DIMENSIONS: usize>(input : &InputType, iterations: usize) -> usize
+{
+    const PADDING:usize = 6; 
+    // Init with enough room to grow plus outer padding for convolutions
+    let mut dimensions = [PADDING + iterations*2; NUM_DIMENSIONS]; 
+    dimensions[NUM_DIMENSIONS-1] += input.width();
+    dimensions[NUM_DIMENSIONS-2] += input.height();
+
+    let mut cubes = Array::<_, IxDyn>::zeros(&dimensions[..]); // Stuck using dynamic because ndarray doesn't see [_;NUM_DIMENSIONS]
+                                                               // as a fixed-sized array
+    
+    // Seed with initial input in the center of the space
+    for (y, row) in input.rows().enumerate()
+    {
+        for (x, value) in row.iter().enumerate()
+        {
+            let mut idx = [iterations+PADDING/2; NUM_DIMENSIONS];
+            idx[NUM_DIMENSIONS-1] += x;
+            idx[NUM_DIMENSIONS-2] += y;
+            cubes[&idx[..]] = if *value == '#' {1} else {0};
+        }
+    }
+
+    for _ in 0..iterations
+    {
+        let mut new_cubes = cubes.clone();
+        let mut idx = [1;NUM_DIMENSIONS];
+        for window in cubes.windows(&[3;NUM_DIMENSIONS][..])
+        {
+            let center = &[1;NUM_DIMENSIONS][..];
+            let neighbors = window.sum() - window[center];
+
+            if window[center] == 0 && neighbors == 3 { new_cubes[&idx[..]] = 1; }
+            if window[center] == 1 && !(neighbors == 2 || neighbors == 3) { new_cubes[&idx[..]] = 0; }
+
+            idx[NUM_DIMENSIONS-1] += 1;
+            for i in (1..NUM_DIMENSIONS).rev()
+            {
+                if idx[i] >= (dimensions[i]-1) { idx[i-1] += 1; idx[i] = 1; }
+            }
+        }
+
+        swap(&mut cubes, &mut new_cubes);
+    }
+
+    cubes.sum()
 }
 
 #[cfg(test)]

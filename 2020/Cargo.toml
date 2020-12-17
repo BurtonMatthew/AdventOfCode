@@ -11,3 +11,4 @@ nom = "6.0.1"
 fn-memo = "1.2.0"
 packed_simd = { version = "0.3.4", package = "packed_simd_2" }
 pathfinding = "2.1.1"
+ndarray = "0.14.0"

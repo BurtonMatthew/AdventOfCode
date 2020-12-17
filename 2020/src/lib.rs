@@ -1,3 +1,4 @@
+#![feature(min_const_generics)]
 extern crate aoc_runner;
 #[macro_use]
 extern crate aoc_runner_derive;
@@ -8,6 +9,7 @@ extern crate nom;
 extern crate text_io;
 extern crate packed_simd;
 extern crate pathfinding;
+extern crate ndarray;
 
 pub mod vec2;
 
