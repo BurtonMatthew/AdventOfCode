@@ -19,12 +19,17 @@ pub fn parse_expr(expr: &[u8], idx: &mut usize, op_precedences: &[(Op, usize)]) 
     let mut ops: Vec<Op> = Vec::new();
     let mut vals: Vec<usize> = Vec::new();
 
-    while *idx != expr.len() && expr[*idx] != b')'
+    while *idx != expr.len()
     {
         if expr[*idx] == b'('
         {
             *idx += 1;
             vals.push(parse_expr(expr, idx, op_precedences));
+        }
+        else if expr[*idx] == b')'
+        {
+            *idx += 1;
+            break;
         }
         else if expr[*idx] >= b'0' && expr[*idx] <= b'9'
         {
@@ -44,11 +49,6 @@ pub fn parse_expr(expr: &[u8], idx: &mut usize, op_precedences: &[(Op, usize)]) 
         {
             *idx += 1;
         }
-    }
-
-    if *idx != expr.len()
-    {
-        *idx += 1;
     }
 
     let max_precendence = op_precedences.iter().map(|(_,p)| *p).max().unwrap_or(0);
