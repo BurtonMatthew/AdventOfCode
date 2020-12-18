@@ -64,13 +64,14 @@ pub fn parse_expr(expr: &[u8], idx: &mut usize) -> usize
 
 pub fn parse_num(expr: &[u8], idx: &mut usize) -> usize
 {
-    let start_idx = idx.clone();
+    let mut result = 0;
     while *idx < expr.len() && expr[*idx] >= b'0' && expr[*idx] <= b'9'
     {
+        result *= 10;
+        result += (expr[*idx] - b'0') as usize;
         *idx += 1;
     }
-
-    str::from_utf8(&expr[start_idx..*idx]).unwrap().parse().unwrap()
+    result
 }
 
 #[aoc(day18, part2)]
