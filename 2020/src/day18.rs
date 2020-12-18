@@ -1,7 +1,7 @@
 use std::str;
 
-#[derive(Debug, Clone, PartialEq)]
-enum Op
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum Op
 {
     Add,
     Mul
@@ -10,10 +10,11 @@ enum Op
 #[aoc(day18, part1)]
 pub fn part1(input : &str) -> usize
 {
-    input.lines().map(|l| parse_expr(&l.bytes().collect::<Vec<_>>(), &mut 0)).sum()
+    let op_precedences = [(Op::Add, 0), (Op::Mul, 0)];
+    input.lines().map(|l| parse_expr(&l.bytes().collect::<Vec<_>>(), &mut 0, &op_precedences)).sum()
 }
 
-pub fn parse_expr(expr: &[u8], idx: &mut usize) -> usize
+pub fn parse_expr(expr: &[u8], idx: &mut usize, op_precedences: &[(Op, usize)]) -> usize
 {
     let mut ops: Vec<Op> = Vec::new();
     let mut vals: Vec<usize> = Vec::new();
@@ -23,7 +24,7 @@ pub fn parse_expr(expr: &[u8], idx: &mut usize) -> usize
         if expr[*idx] == b'('
         {
             *idx += 1;
-            vals.push(parse_expr(expr, idx));
+            vals.push(parse_expr(expr, idx, op_precedences));
         }
         else if expr[*idx] >= b'0' && expr[*idx] <= b'9'
         {
@@ -50,16 +51,35 @@ pub fn parse_expr(expr: &[u8], idx: &mut usize) -> usize
         *idx += 1;
     }
 
-    let mut total = vals[0];
-    for (i,op) in ops.iter().enumerate()
+    let max_precendence = op_precedences.iter().map(|(_,p)| *p).max().unwrap_or(0);
+    for current_precendence in 0..=max_precendence
     {
-        match op
+        let current_ops = op_precedences.iter()
+                                        .filter(|(_,p)| *p == current_precendence)
+                                        .map(|(op,_)| *op)
+                                        .collect::<Vec<_>>();
+        let mut i = 0;
+        let mut num_ops = ops.len();
+        while i < num_ops
         {
-            Op::Add => { total += vals[i+1]; }
-            Op::Mul => { total *= vals[i+1]; }
+            if current_ops.contains(&ops[i])
+            {
+                match ops[i]
+                {
+                    Op::Add => { vals[i] += vals[i+1]; }
+                    Op::Mul => { vals[i] *= vals[i+1]; }
+                }
+                ops.remove(i);
+                num_ops -= 1;
+                vals.remove(i+1);
+            }
+            else
+            {
+                i += 1;
+            }
         }
     }
-    total
+    vals[0]
 }
 
 pub fn parse_num(expr: &[u8], idx: &mut usize) -> usize
@@ -77,68 +97,9 @@ pub fn parse_num(expr: &[u8], idx: &mut usize) -> usize
 #[aoc(day18, part2)]
 pub fn part2(input : &str) -> usize
 {
-    input.lines().map(|l| parse_expr_2(&l.bytes().collect::<Vec<_>>(), &mut 0)).sum()
+    let op_precedences = [(Op::Add, 0), (Op::Mul, 1)];
+    input.lines().map(|l| parse_expr(&l.bytes().collect::<Vec<_>>(), &mut 0, &op_precedences)).sum()
 }
-
-pub fn parse_expr_2(expr: &[u8], idx: &mut usize) -> usize
-{
-    let mut ops: Vec<Op> = Vec::new();
-    let mut vals: Vec<usize> = Vec::new();
-
-    while *idx != expr.len() && expr[*idx] != b')'
-    {
-        if expr[*idx] == b'('
-        {
-            *idx += 1;
-            vals.push(parse_expr_2(expr, idx));
-        }
-        else if expr[*idx] >= b'0' && expr[*idx] <= b'9'
-        {
-            vals.push(parse_num(&expr, idx));
-        }
-        else if expr[*idx] == b'+'
-        {
-            ops.push(Op::Add);
-            *idx += 1;
-        }
-        else if expr[*idx] == b'*'
-        {
-            ops.push(Op::Mul);
-            *idx += 1;
-        }
-        else
-        {
-            *idx += 1;
-        }
-    }
-
-    if *idx != expr.len()
-    {
-        *idx += 1;
-    }
-
-    // Parse Add ops first (highest precedence)
-    let mut i = 0;
-    let mut num_ops = ops.len();
-    while i < num_ops
-    {
-        if ops[i] == Op::Add
-        {
-            ops.remove(i);
-            num_ops -= 1;
-            let sum = vals[i] + vals[i+1];
-            vals[i] = sum;
-            vals.remove(i+1);
-        }
-        else
-        {
-            i += 1;
-        }
-    }
-
-    vals.iter().product()
-}
-
 
 #[cfg(test)]
 mod tests 
