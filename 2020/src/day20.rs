@@ -23,8 +23,8 @@ impl fmt::Display for Piece
 
             write!(f, "\n")?;
         }
-        write!(f, "Keys: {:#?}\n", self.edge_keys)?;
-        write!(f, "Edges: {:#?}\n", self.edges)?;
+        write!(f, "Keys: {:?}\n", self.edge_keys)?;
+        write!(f, "Edges: {:?}\n", self.edges)?;
 
         fmt::Result::Ok(())
     }
@@ -108,6 +108,7 @@ pub fn part1(input : &InputType) -> usize
 pub fn part2(input : &InputType) -> usize
 {
     let all_edges = input.iter().flat_map(|piece| piece.edge_keys.iter()).collect::<Vec<_>>();
+    // TODO: there might not be a topleft oriented piece in the input, take any corner and manually orient
     let top_left = input.iter().position(|piece| all_edges.iter().filter(|ae| piece.edge_keys[0] == ***ae).count() == 1
                                               && all_edges.iter().filter(|ae| piece.edge_keys[3] == ***ae).count() == 1).unwrap();
 
@@ -209,6 +210,7 @@ pub fn part2(input : &InputType) -> usize
         flip_vertical(&mut map, map_dims);
     }
 
+    println!("{}", num_monsters);
     map.into_iter().filter(|&c| c == b'#').count() - num_monsters*15
 }
 
