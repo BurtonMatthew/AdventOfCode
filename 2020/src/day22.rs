@@ -1,0 +1,132 @@
+use std::collections::VecDeque;
+
+type InputType = (VecDeque<u32>, VecDeque<u32>);
+#[aoc_generator(day22)]
+pub fn parse_input(buf :&str) -> InputType
+{
+    let mut blocks = buf.split("\n\n");
+    (blocks.next().unwrap().lines().skip(1).map(|i| i.parse().unwrap()).collect(), blocks.next().unwrap().lines().skip(1).map(|i| i.parse().unwrap()).collect())
+}
+
+#[aoc(day22, part1)]
+pub fn part1(input : &InputType) -> usize
+{
+    let (mut p1, mut p2) = input.clone();
+    while !p1.is_empty() && !p2.is_empty()
+    {
+        let p1top = p1.pop_front().unwrap();
+        let p2top = p2.pop_front().unwrap();
+
+        if p1top > p2top
+        {
+            p1.push_back(p1top);
+            p1.push_back(p2top);
+        }
+        else
+        {
+            p2.push_back(p2top);
+            p2.push_back(p1top);
+        }
+    }
+    
+    let winning = if !p1.is_empty() {p1} else {p2};
+    winning.into_iter().rev().enumerate().map(|(i, card)| (i+1) * card as usize).sum()
+}
+
+#[aoc(day22, part2)]
+pub fn part2(input : &InputType) -> usize
+{
+    let (mut p1, mut p2) = input.clone();
+    let mut prev = Vec::new();
+    recursive_combat(&mut p1, &mut p2, &mut prev);
+    let winning = if !p1.is_empty() {p1} else {p2};
+    winning.into_iter().rev().enumerate().map(|(i, card)| (i+1) * card as usize).sum()
+}
+
+pub fn recursive_combat(p1: &mut VecDeque<u32>, p2: &mut VecDeque<u32>, prev: &mut Vec<(VecDeque<u32>, VecDeque<u32>)>) -> bool
+{
+    while !p1.is_empty() && !p2.is_empty()
+    {
+        if prev.contains(&(p1.clone(),p2.clone()))
+        {
+            return true;
+        }
+        else
+        {
+            prev.push((p1.clone(), p2.clone()));
+        }
+
+        let p1top = p1.pop_front().unwrap();
+        let p2top = p2.pop_front().unwrap();
+
+        if p1top as usize <= p1.len() && p2top as usize <= p2.len()
+        {
+            if recursive_combat(&mut p1.iter().take(p1top as usize).cloned().collect(), &mut p2.iter().take(p2top as usize).cloned().collect(), &mut Vec::new())
+            {
+                p1.push_back(p1top);
+                p1.push_back(p2top);
+            }
+            else
+            {
+                p2.push_back(p2top);
+                p2.push_back(p1top);
+            }
+        }
+        else if p1top > p2top
+        {
+            p1.push_back(p1top);
+            p1.push_back(p2top);
+        }
+        else
+        {
+            p2.push_back(p2top);
+            p2.push_back(p1top);
+        }
+    }
+
+    !p1.is_empty()
+}
+
+#[cfg(test)]
+mod tests 
+{
+    use super::*;
+
+    const TEST_DATA: &str = 
+"Player 1:
+9
+2
+6
+3
+1
+
+Player 2:
+5
+8
+4
+7
+10";
+
+    const TEST_DATA_INF: &str =
+"Player 1:
+43
+19
+
+Player 2:
+2
+29
+14";
+
+    #[test]
+    pub fn part1_test() 
+    {
+        assert_eq!(part1(&parse_input(TEST_DATA)), 306)
+    }
+
+    #[test]
+    pub fn part2_test() 
+    {
+        assert_eq!(part2(&parse_input(TEST_DATA)), 291);
+        part2(&parse_input(TEST_DATA_INF));
+    }
+}
