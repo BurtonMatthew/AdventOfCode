@@ -1,4 +1,7 @@
 use std::collections::VecDeque;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::Hasher;
+use std::hash::Hash;
 
 type InputType = (VecDeque<u32>, VecDeque<u32>);
 #[aoc_generator(day22)]
@@ -43,7 +46,7 @@ pub fn part2(input : &InputType) -> usize
     winning.into_iter().rev().enumerate().map(|(i, card)| (i+1) * card as usize).sum()
 }
 
-pub fn recursive_combat(p1: &mut VecDeque<u32>, p2: &mut VecDeque<u32>, prev: &mut Vec<(VecDeque<u32>, VecDeque<u32>)>, is_subgame: bool) -> bool
+pub fn recursive_combat(p1: &mut VecDeque<u32>, p2: &mut VecDeque<u32>, prev: &mut Vec<u64>, is_subgame: bool) -> bool
 {
     if is_subgame && p1.iter().max().unwrap() > p2.iter().max().unwrap()
     {
@@ -51,13 +54,17 @@ pub fn recursive_combat(p1: &mut VecDeque<u32>, p2: &mut VecDeque<u32>, prev: &m
     }
     while !p1.is_empty() && !p2.is_empty()
     {
-        if prev.contains(&(p1.clone(),p2.clone()))
+        let mut hasher = DefaultHasher::new();
+        p1.hash(&mut hasher);
+        p2.hash(&mut hasher);
+        let hash = hasher.finish();
+        if prev.contains(&hash)
         {
             return true;
         }
         else
         {
-            prev.push((p1.clone(), p2.clone()));
+            prev.push(hash);
         }
 
         let p1top = p1.pop_front().unwrap();
