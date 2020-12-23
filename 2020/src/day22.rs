@@ -38,13 +38,17 @@ pub fn part2(input : &InputType) -> usize
 {
     let (mut p1, mut p2) = input.clone();
     let mut prev = Vec::new();
-    recursive_combat(&mut p1, &mut p2, &mut prev);
+    recursive_combat(&mut p1, &mut p2, &mut prev, false);
     let winning = if !p1.is_empty() {p1} else {p2};
     winning.into_iter().rev().enumerate().map(|(i, card)| (i+1) * card as usize).sum()
 }
 
-pub fn recursive_combat(p1: &mut VecDeque<u32>, p2: &mut VecDeque<u32>, prev: &mut Vec<(VecDeque<u32>, VecDeque<u32>)>) -> bool
+pub fn recursive_combat(p1: &mut VecDeque<u32>, p2: &mut VecDeque<u32>, prev: &mut Vec<(VecDeque<u32>, VecDeque<u32>)>, is_subgame: bool) -> bool
 {
+    if is_subgame && p1.iter().max().unwrap() > p2.iter().max().unwrap()
+    {
+        return true;
+    }
     while !p1.is_empty() && !p2.is_empty()
     {
         if prev.contains(&(p1.clone(),p2.clone()))
@@ -61,7 +65,7 @@ pub fn recursive_combat(p1: &mut VecDeque<u32>, p2: &mut VecDeque<u32>, prev: &m
 
         if p1top as usize <= p1.len() && p2top as usize <= p2.len()
         {
-            if recursive_combat(&mut p1.iter().take(p1top as usize).cloned().collect(), &mut p2.iter().take(p2top as usize).cloned().collect(), &mut Vec::new())
+            if recursive_combat(&mut p1.iter().take(p1top as usize).cloned().collect(), &mut p2.iter().take(p2top as usize).cloned().collect(), &mut Vec::new(), true)
             {
                 p1.push_back(p1top);
                 p1.push_back(p2top);
