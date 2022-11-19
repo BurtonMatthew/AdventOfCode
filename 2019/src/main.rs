@@ -1,6 +1,3 @@
-#![allow(incomplete_features)]
-#![feature(const_generics)]
-
 use std::time::Instant;
 use std::fs;
 

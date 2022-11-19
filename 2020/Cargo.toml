@@ -3,12 +3,12 @@ name = "aoc-2020"
 version = "0.1.0"
 
 [dependencies]
-itertools = "0.9.0"
-aoc-runner = "0.3.0"
-aoc-runner-derive = "0.3.0"
-text_io = "0.1.8"
-nom = "6.0.1"
-fn-memo = "1.2.0"
-packed_simd = { version = "0.3.4", package = "packed_simd_2" }
-pathfinding = "2.1.1"
-ndarray = "0.14.0"
+itertools = "^0.10.5"
+aoc-runner = "^0.3.0"
+aoc-runner-derive = "^0.3.0"
+text_io = "^0.1.8"
+nom = "^6.0.1"
+fn-memo = "^1.2.0"
+packed_simd = { version = "^0.3.4", package = "packed_simd_2" }
+pathfinding = "^2.1.1"
+ndarray = "^0.14.0"

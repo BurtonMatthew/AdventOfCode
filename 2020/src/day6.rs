@@ -68,7 +68,7 @@ pub fn part2_hashset(input : &Vec<String>) -> usize
     {
         s.lines()
             .map(|l| l.chars().collect::<HashSet<_>>())
-            .fold1(|set1, set2| &set1 & &set2)
+            .reduce(|set1, set2| &set1 & &set2)
             .unwrap()
             .len()
     }).sum()

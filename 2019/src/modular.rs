@@ -22,7 +22,7 @@ impl<T, const MOD: i128> ModInteger<T, {MOD}>
 
     pub fn pow(&self, exp: T) -> Self
     {
-        Self::modulo(mod_pow(self.value, exp, {MOD}))
+        Self::modulo(mod_pow(self.value, exp, MOD))
     }
 }
 

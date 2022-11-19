@@ -3,6 +3,6 @@ name = "aoc-2019"
 version = "0.1.0"
 
 [dependencies]
-itertools = "0.8.2"
-num = "0.2.0"
-pathfinding = "2.0.1"
+itertools = "^0.10.5"
+num = "^0.2.0"
+pathfinding = "^2.0.1"
