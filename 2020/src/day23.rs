@@ -7,7 +7,6 @@ pub fn parse_input(buf :&str) -> InputType
     buf.bytes().map(|b| (b - b'0') as usize).collect()
 }
 
-
 #[aoc(day23, part1)]
 pub fn part1(input : &InputType) -> String
 {

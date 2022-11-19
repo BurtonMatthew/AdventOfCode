@@ -8,7 +8,7 @@ type InputType = (VecDeque<u32>, VecDeque<u32>);
 pub fn parse_input(buf :&str) -> InputType
 {
     let sanitized_buf = buf.replace("\r","");
-    let mut blocks = sanitizedBuf.split("\n\n");
+    let mut blocks = sanitized_buf.split("\n\n");
     (blocks.next().unwrap().lines().skip(1).map(|i| i.parse().unwrap()).collect(), blocks.next().unwrap().lines().skip(1).map(|i| i.parse().unwrap()).collect())
 }
 
