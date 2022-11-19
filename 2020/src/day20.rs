@@ -210,7 +210,6 @@ pub fn part2(input : &InputType) -> usize
         flip_vertical(&mut map, map_dims);
     }
 
-    println!("{}", num_monsters);
     map.into_iter().filter(|&c| c == b'#').count() - num_monsters*15
 }
 
