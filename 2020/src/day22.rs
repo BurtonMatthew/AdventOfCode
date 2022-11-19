@@ -7,7 +7,8 @@ type InputType = (VecDeque<u32>, VecDeque<u32>);
 #[aoc_generator(day22)]
 pub fn parse_input(buf :&str) -> InputType
 {
-    let mut blocks = buf.split("\n\n");
+    let sanitized_buf = buf.replace("\r","");
+    let mut blocks = sanitizedBuf.split("\n\n");
     (blocks.next().unwrap().lines().skip(1).map(|i| i.parse().unwrap()).collect(), blocks.next().unwrap().lines().skip(1).map(|i| i.parse().unwrap()).collect())
 }
 
